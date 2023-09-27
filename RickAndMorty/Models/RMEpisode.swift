@@ -22,6 +22,7 @@ struct RMEpisode: Codable {
 
 -> Creating Models Section
 
+
 Schema ) The schema for RMCharacter can be found at https://rickandmortyapi.com/documentation/#episode-schema
 
 */
