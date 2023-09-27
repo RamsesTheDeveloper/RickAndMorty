@@ -6,5 +6,6 @@ Group ) Within the Controllers Group, we created a SubGroup called Core.
 Core will contain the Controller files for our particular Core navigation which will be Character, Location, Episode, and Settings.
 
 
+
 Cocoa Touch ) When creating our ViewControllers, we will select Cocoa Touch Class.
 The Class we will use is UIViewController.

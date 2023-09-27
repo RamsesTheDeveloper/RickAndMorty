@@ -26,6 +26,7 @@ final class RMCharacterViewController: UIViewController {
 view.backgroundColor ) We are going to support both light mode and dark mode, so we are going to set the value of view.backgroundColor equal to .systemBackground.
 
 
+
 title ) The title property is used to set the title of the ViewController's NavigationBar.
 
 

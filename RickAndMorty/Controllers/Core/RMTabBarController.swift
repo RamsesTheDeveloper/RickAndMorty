@@ -52,11 +52,14 @@ final class RMTabBarController: UITabBarController {
 Primary Controller ) RMTabBarController is the housing controller, it houses all of our other controllers.
 
 
+
 final Class ) We will declare our ViewControllers final with the goal of avoiding inheritance.
+
 
 
 Attaching Controllers ) Within our RMTabBarController we created a setUpTabs() Function.
 The setUpTabs() Function needs to be called within viewDidLoad() in order for our tabs to be attached to our RMTabBarController.
+
 
 
 setUpTabs ) We are making the setUpTabs() Function private because code outside of our RMTabBarController should not be able to access/invoke this Function.
@@ -64,6 +67,7 @@ setUpTabs ) We are making the setUpTabs() Function private because code outside 
 Within the setUpTabs() Function, we are going to create instances of our ViewControllers and attach them to our TabBarController via the setViewControllers() Function.
 
 The setViewControllers() Function is made avaiable by the UITabBarController Class.
+
 
 
 UINavigationController ) We want our screens to have a title bar at the top which is also known as a NavigatioBar.
@@ -75,7 +79,9 @@ Setting Titles ) To set the title of our screens, we need to open the ViewContro
 See RMCharacterViewController for reference.
 
 
+
 tabBarItem ) We want to set a tabBarItem for all of our UINavigationControllers, each item will have a tag.
+
 
 
 Large Titles ) To set large titles we need to make two changes to our code :
