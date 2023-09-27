@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Controller to show and search for Characters
 final class RMCharacterViewController: UIViewController {
 
     override func viewDidLoad() {
@@ -20,7 +21,7 @@ final class RMCharacterViewController: UIViewController {
 
 /*
 
--> Introduction
+-> Introduction Section
 
 
 view.backgroundColor ) We are going to support both light mode and dark mode, so we are going to set the value of view.backgroundColor equal to .systemBackground.
@@ -30,4 +31,4 @@ view.backgroundColor ) We are going to support both light mode and dark mode, so
 title ) The title property is used to set the title of the ViewController's NavigationBar.
 
 
- */
+*/

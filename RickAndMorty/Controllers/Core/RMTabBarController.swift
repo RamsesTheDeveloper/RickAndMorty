@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// Controller to house tabs and root tab controllers
 final class RMTabBarController: UITabBarController {
 
     override func viewDidLoad() {
@@ -93,4 +94,4 @@ Large Titles ) To set large titles we need to make two changes to our code :
     This approach is different than the first one because in the first one we have to set the xxx preference to xxx manually, but in this approach, since all of the objects are of the same Type, we can set .prefersLargeTitles to true for each object in our iteration.
 
 
- */
+*/

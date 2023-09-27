@@ -9,3 +9,10 @@ Core will contain the Controller files for our particular Core navigation which 
 
 Cocoa Touch ) When creating our ViewControllers, we will select Cocoa Touch Class.
 The Class we will use is UIViewController.
+
+
+
+-> Source Control Section
+
+
+Documentation ) It is best practice to document our code as we go, that way we don't have the overhead of doing it later on.
