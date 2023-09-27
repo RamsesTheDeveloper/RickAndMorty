@@ -15,7 +15,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
-        let vc = ViewController()
+        let vc = RMTabBarController()
         
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = vc
@@ -35,7 +35,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func sceneWillEnterForeground(_ scene: UIScene) {
     }
-
+    
     func sceneDidEnterBackground(_ scene: UIScene) {
     }
 
@@ -43,8 +43,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 /*
- 
- Inside of the scene() Function, we create a window and we attach it to our primary ViewController.
+
+-> Introduction Section
+
+
+ scene ) Inside of the scene() Function, we create a window and we attach it to our primary ViewController.
  
      self.window = window // Retains the window we created within the scene() Function.
  
