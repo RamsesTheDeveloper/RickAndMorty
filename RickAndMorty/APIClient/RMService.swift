@@ -78,6 +78,9 @@ We enforce the singleton pattern by making our Class's initializer private.
 
 
 MARK ) MARK signals that we will create private utilities within our application.
+MARKs help us logically separate our code.
+
+When we use a MARK Xcode will put a bookmark for us in the header under our toolbar, what is meant by this is that if we look at the end of our path RickAndMorty > RickAndMorty > APIClient > RMService > RMService, if we click on the last slot (RMService) a pop-up will show up with bookmarks of our objects and one of those bookmarks is our MARK that we highlighted as private which is represented by an organge flag.
 
 
 

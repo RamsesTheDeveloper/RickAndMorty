@@ -27,7 +27,9 @@ final class RMCharacterListView: UIView {
         collectionView.isHidden = true
         collectionView.alpha = 0
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        // collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.register(RMCharacterCollectionViewCell.self,
+                                forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier)
         return collectionView
     }()
     
@@ -192,5 +194,26 @@ Then, returning to our RMCharacterListViewViewModel, we are going to conform to 
 
 Summary ) We hard coded our cells, but the point was to set up the foundation for our RMCharacterListView.
 We set up a ViewModel that fetches data and conforms to UICollectionViewDataSource and UICollectionViewDelegate, we created a basic View that displays a spinner if there is no data and a collectionView if data is provided.
+
+*/
+
+
+/*
+
+
+-> Character Cell Section
+
+
+RMCharacterCollectionViewCell ) We registered UICollectionViewCell.self as the cell of our collectionView with an id of cell, but this is not what we want.
+
+We want a custom cell that is going to display information about a character such as an image or a name.
+But before we start designing, we are going to create a UICollectionViewCell Cocoa Touch Class called RMCharacterCollectionViewCell inside of the Views Group.
+
+
+
+register ) We are going to register RMCharacterCollectionViewCell as the cell of our collectionView.
+Note that we are using our static Constant as the cell's identifier.
+
+
 
 */

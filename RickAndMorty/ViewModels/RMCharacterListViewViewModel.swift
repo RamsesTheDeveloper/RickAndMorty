@@ -30,8 +30,21 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .systemGreen
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier,
+            for: indexPath
+        ) as? RMCharacterCollectionViewCell else {
+            fatalError("Unsupported cell")
+        }
+        
+        let viewModel = RMCharacterCollectionViewCellViewModel(
+            characterName: "Kurt",
+            characterStatus: .unknown,
+            characterImageUrl: nil
+        )
+        // URL(string: "https://cdn.britannica.com/82/101882-050-9FA7F900/Kurt-Cobain-Nirvana-1993.jpg")
+        
+        cell.configure(with: viewModel)
         return cell
     }
     
@@ -64,7 +77,7 @@ We want our Views, ViewModels, and all other objects to have one or a handful of
 
 
 
-Subjective ) It is subjective to have the ViewModel be the data source or the Controller, etc. but in our application we will have our ViewModel be the data source.
+Subjective Design ) It is subjective to have the ViewModel be the data source or the Controller, etc. but in our application we will have our ViewModel be the data source.
 
 
 
@@ -94,5 +107,41 @@ Margins ) Currently our cells don't have a margin, so they are being pushed to t
 
 To fix this, we are going to open our RMCharacterListView and make changes to our collectionView's layout Constant.
 Go inside of the comments and look for layout.sectionInset.
+
+*/
+
+
+/*
+
+
+-> Character Cell Section
+
+
+RMCharacterCollectionViewCell ) We are going to enter RMCharacterCollectionViewCell's static Constant as the identifier for the cellForItemAt() Function.
+
+This is the code we are replacing and it is also the code we used while developing our RMCharacterListViewViewModel :
+
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+    cell.backgroundColor = .systemGreen
+    return cell
+
+
+
+Design Change ) Later on, we are going to abstract the DataSource and Delegate logic to our ViewController because our ViewController is small as of now.
+
+This change is subjective, but it is worth seeing both approaches.
+
+
+
+Testing ) We are going to test our RMCharacterCollectionViewCellViewModel's fetchImage() Function within RMCharacterListViewViewModel's cellForItemAt() Function :
+
+
+To test fetchImage(), we cast our deque cell as RMCharacterCollectionViewCell.
+
+Now, RMCharacterCollectionViewCell has a configure() Function that asks for a ViewModel of Type RMCharacterCollectionViewCellViewModel.
+
+So, we are going to create that ViewModel and pass it into the RMCharacterCollectionViewCell's configure() Function.
+
+In order to test that our cell is working, we need to open the RMCharacterCollectionViewCell and set up the contraints for the imageView, nameLabel, and statusLabel on the paernt View.
 
 */
