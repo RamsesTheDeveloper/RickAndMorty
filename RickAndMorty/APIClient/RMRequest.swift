@@ -69,6 +69,10 @@ final class RMRequest {
     
 }
 
+extension RMRequest {
+    static let listCharactersRequests = RMRequest(endpoint: .character)
+}
+
 /*
 
 
@@ -104,5 +108,36 @@ Testing ) To test that our Functionality is working, we are going to open our RM
 
 
 Set ) The instructor mentioned that if we gave pathComponents a Type of Set<String>, then our application would be optimizied because there would be no case in which the pathComponents could be charactercharacter or locationlocation becuase Sets hold unique instances while Arrays can hold the same instance.
+
+But we do want pathComponents to be ordered, which Array accomodates for, so we will stick to Array of String.
+Another option is NSOrderedSet.
+
+*/
+
+
+/*
+
+
+-> API Service Section
+
+
+extension ) Within our RMRequest extension, we are going to create a convenience object.
+We are going to create some requests that we will convieniently use in our code.
+
+
+
+listCharactersRequests ) The beauty of this design is that it improves readability.
+For example, if we return to our RMCharacterViewController, we can now say :
+
+    RMService.shared.execute(.listCharactersRequests, expecting: String.self) { result in
+        switch result {
+        case .success(let model):
+            print(String(describing: model))
+        case .failure(let error):
+            print(String(describing: error))
+        }
+    }
+
+
 
 */

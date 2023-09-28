@@ -82,3 +82,53 @@ The reason that our execute() Function asks for the Type we are expecting and re
 
 
 */
+
+
+/*
+
+
+-> API Service Section
+
+
+DoCatch Test ) We are testing that our do statement is running correctly, the do statement was created within our RMService's execute() Function.
+
+The do statement should print a JSON object to the console when the execute() Function runs.
+We are going to switch on the result and break on the success case, if we receive and error, we are going to print out a String describing that failure :
+
+    let request = RMRequest(endpoint: .character, queryParameters: [
+        URLQueryItem(name: "name", value: "rick"),
+        URLQueryItem(name: "status", value: "alive")
+    ])
+
+    print(request.url)
+
+    RMService.shared.execute(request, expecting: RMCharacter.self) { result in
+        switch result {
+        case .success:
+            break
+        case .failure(let error):
+            print(String(describing: error))
+        }
+    }
+
+The reason that we are breaking in the success case instead of doing something with the data is because we are testing to see if our do statement is going to print out a JSON object.
+
+The test succeeded.
+
+
+
+RMGetAllCharactersResponse ) To test out the RMGetAllCharactersResponse Model, we ran this code inside of the viewDidLoad() Function :
+
+RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { result in
+    switch result {
+    case .success(let model):
+        // print(String(describing: model))
+        print("Total: " + String(model.info.count))
+        print("Page amount: " + String(model.info.pages))
+        print("Page result count: " + String(model.results.count))
+    case .failure(let error):
+        print(String(describing: error))
+    }
+}
+
+*/

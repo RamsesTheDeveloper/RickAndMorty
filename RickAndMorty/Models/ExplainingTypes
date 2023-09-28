@@ -1,0 +1,8 @@
+
+-> API Service Section
+
+
+Types ) We broke up our Types into 2 Groups because one Group, DataTypes, stores Models for Character, Location, and Episode.
+
+We are going to leverage these Models in our APIResponseTypes.
+For example, the RMGetAllCharactersResponse Struct has a nested Info Struct, but its main content is RMCharacter because it retrieves all of the characters in the database with the small difference that it has pagination.
