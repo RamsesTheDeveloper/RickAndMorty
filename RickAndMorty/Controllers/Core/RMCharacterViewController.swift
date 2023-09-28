@@ -9,12 +9,26 @@ import UIKit
 
 /// Controller to show and search for Characters
 final class RMCharacterViewController: UIViewController {
+    
+    private let characterListView = RMCharacterListView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Characters"
         
+        setUpView()
+    }
+    
+    private func setUpView() {
+        view.addSubview(characterListView)
+        
+        NSLayoutConstraint.activate([
+            characterListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            characterListView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            characterListView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            characterListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
     }
 }
 
@@ -119,16 +133,38 @@ The test succeeded.
 
 RMGetAllCharactersResponse ) To test out the RMGetAllCharactersResponse Model, we ran this code inside of the viewDidLoad() Function :
 
-RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { result in
-    switch result {
-    case .success(let model):
-        // print(String(describing: model))
-        print("Total: " + String(model.info.count))
-        print("Page amount: " + String(model.info.pages))
-        print("Page result count: " + String(model.results.count))
-    case .failure(let error):
-        print(String(describing: error))
+    RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { result in
+        switch result {
+        case .success(let model):
+            // print(String(describing: model))
+            print("Total: " + String(model.info.count))
+            print("Page amount: " + String(model.info.pages))
+            print("Page result count: " + String(model.results.count))
+        case .failure(let error):
+            print(String(describing: error))
+        }
     }
-}
+
+*/
+
+
+/*
+
+
+-> Character List View Section
+
+
+characterListView ) To display RMCharacterListView on the screen, we need to create an instance of it in our RMCharacterViewController.
+
+To add our instance of RMCharacterListView to RMCharacterViewController's View, we need to pass it into view.addSubview().
+
+To put RMCharacterListView on the screen, we need to create constraints.
+
+After running the simulator, notice that if we turn the simulator from protrait mode to landscape mode, the title of this ViewController adapts, that's because in our RMTabBarController we set .largeTitleDisplayMode to .automatic.
+
+
+
+setUpView ) To keep our code organized, we are going to remove our constraints from the viewDidLoad() Function and place it inside of a Function caled setUpView(), setUpView() will be called from viewDidLoad().
+
 
 */
