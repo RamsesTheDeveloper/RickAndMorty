@@ -17,6 +17,7 @@ final class RMCharacterListViewViewModel: NSObject {
                 print("Total: " + String(model.info.count))
                 print("Page amount: " + String(model.info.pages))
                 print("Page result count: " + String(model.results.count))
+                print("Example image url: " + String(model.results.first?.image ?? "No image"))
             case .failure(let error):
                 print(String(describing: error))
             }
@@ -37,12 +38,12 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
             fatalError("Unsupported cell")
         }
         
+        
         let viewModel = RMCharacterCollectionViewCellViewModel(
             characterName: "Kurt",
             characterStatus: .unknown,
-            characterImageUrl: nil
+            characterImageUrl: URL(string: "https://cdn.britannica.com/82/101882-050-9FA7F900/Kurt-Cobain-Nirvana-1993.jpg")
         )
-        // URL(string: "https://cdn.britannica.com/82/101882-050-9FA7F900/Kurt-Cobain-Nirvana-1993.jpg")
         
         cell.configure(with: viewModel)
         return cell
@@ -143,5 +144,39 @@ Now, RMCharacterCollectionViewCell has a configure() Function that asks for a Vi
 So, we are going to create that ViewModel and pass it into the RMCharacterCollectionViewCell's configure() Function.
 
 In order to test that our cell is working, we need to open the RMCharacterCollectionViewCell and set up the contraints for the imageView, nameLabel, and statusLabel on the paernt View.
+
+
+
+Valid Image ) To get a valid image, we are going to print it to the console :
+
+RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { result in
+    switch result {
+    case .success(let model):
+        print("Example image url: " + String(model.results.first?.image ?? "No image"))
+    case .failure(let error):
+        print(String(describing: error))
+    }
+}
+
+
+Then, take that URL and enter it into our cellForItemAt() Function's hard coded ViewModel :
+
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier,
+            for: indexPath
+        ) as? RMCharacterCollectionViewCell else {
+            fatalError("Unsupported cell")
+        }
+
+        let viewModel = RMCharacterCollectionViewCellViewModel(
+            characterName: "Rick",
+            characterStatus: .alive,
+            characterImageUrl: URL(string: "https://rickandmortyapi.com/api/character/avatar/1.jpeg")
+        )
+
+        cell.configure(with: viewModel)
+        return cell
+    }
 
 */

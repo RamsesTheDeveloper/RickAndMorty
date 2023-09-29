@@ -48,21 +48,25 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
     
     private func addConstraints() {
         NSLayoutConstraint.activate([
-            statusLabel.heightAnchor.constraint(equalToConstant: 50),
+            statusLabel.heightAnchor.constraint(equalToConstant: 40),
             statusLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5),
             statusLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
             statusLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -3),
             
-            nameLabel.heightAnchor.constraint(equalToConstant: 50),
+            nameLabel.heightAnchor.constraint(equalToConstant: 40),
             nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5),
             nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
             nameLabel.bottomAnchor.constraint(equalTo: statusLabel.topAnchor, constant: -3),
             
-            
+            imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
+            imageView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            imageView.bottomAnchor.constraint(equalTo: nameLabel.topAnchor, constant: -3)
         ])
         
+        imageView.backgroundColor = .systemGreen
         nameLabel.backgroundColor = .red
-        statusLabel.backgroundColor = .orange // left off at 2:20:00
+        statusLabel.backgroundColor = .orange
     }
     
     override func prepareForReuse() {
@@ -73,7 +77,20 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
     }
     
     public func configure(with viewModel: RMCharacterCollectionViewCellViewModel) {
-        
+        nameLabel.text = viewModel.characterName
+        statusLabel.text = viewModel.characterStatusText
+        viewModel.fetchImage { [weak self] result in
+            switch result {
+            case .success(let data):
+                DispatchQueue.main.async {
+                    let image = UIImage(data: data)
+                    self?.imageView.image = image
+                }
+            case .failure(let error):
+                print(String(describing: error))
+                break
+            }
+        }
     }
 }
 
@@ -133,6 +150,22 @@ We need a ViewModel because we will need to feed each cell in our UICollectionVi
 Inside of the configure() Function, we want to download the image and assign our image and text to instance of RMCharacterCollectionViewCell.
 
 To do so, we are going to open our RMCharacterCollectionViewCellViewModel.
+
+Whenever configure() is called, we want to assign the contents of our View, which are made available via our ViewModel.
+We are taking the data that our ViewModel is producing and we are giving it to our UIView via the configure() Function.
+
+
+
+Memory Leak ) Inside of our configure() Function's .fetchImage() call, we are referencing the imageView Constant which is owned by self and self is our RMCharacterCollectionViewCell Class.
+
+DispatchQueue is an Asynchronous task, so to avoid a retain cycle, we will need to capture a pointer to self (RMCharacterCollectionViewCell) in a weak capacity, that way it can be broken.
+
+Then, we will need to make self Optional by placing a question mark after the keyword self :
+
+Making self Optional stops us from retaining the cell bi-directionally.
+We don't want to have a pointer that has a strong connection in receivign and sending data because if it is, a retain cycle will ensue.
+
+By making self Optional, the closure is strongly held by the cell, but not vice versa.
 
 
 
