@@ -21,7 +21,8 @@ final class RMCharacterCollectionViewCellViewModel {
     }
     
     public var characterStatusText: String {
-        return characterStatus.rawValue
+        // return characterStatus.rawValue
+        return "Status: \(characterStatus.text)"
     }
     
     public func fetchImage(completion: @escaping (Result<Data, Error>) -> Void) {
@@ -103,5 +104,21 @@ Our RMCharacterListViewViewModel's cellForItemAt() Function creates and casts ou
 
 
 @escaping ) @escaping means that our closure/callback can escape the context of another async task.
+
+*/
+
+
+/*
+
+
+-> Showing Characters Section
+
+
+characterStatusText ) After creating our Protocol-Delegate pattern for RMCharacterListView and RMCharacterListViewViewModel, we ran the simulator and saw that the User Experience was off because the data just says Alive or Dead without context.
+
+We are going to precede the data that we receive from the API with a String.
+We will also make changes to our RMCharacterStatus Enum because the unknown String is not capitalized as of now.
+
+Once that is done, we are going to use .text instead of .rawValue for our characterStatusText Variable.
 
 */

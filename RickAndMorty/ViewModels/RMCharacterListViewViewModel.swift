@@ -7,8 +7,14 @@
 
 import UIKit
 
+protocol RMCharacterListViewViewModelDelegate: AnyObject {
+    func didLoadInitialCharacters()
+}
+
 // struct RMCharacterListViewViewModel
 final class RMCharacterListViewViewModel: NSObject {
+    
+    public weak var delegate: RMCharacterListViewViewModelDelegate?
     
     private var characters: [RMCharacter] = [] {
         didSet {
@@ -32,6 +38,9 @@ final class RMCharacterListViewViewModel: NSObject {
             case .success(let responseModel):
                 let results = responseModel.results
                 self?.characters = results
+                DispatchQueue.main.async {
+                    self?.delegate?.didLoadInitialCharacters()
+                }
             case .failure(let error):
                 print(String(describing: error))
             }
@@ -338,7 +347,44 @@ We could logically separate the indexPath into multiple sections if we have any,
 
 
 
-Reload ) Now that our logic is set up, we will move on to xxxfile where we will tell our collectionView to reload once the data has been updated. Left off at 2:32:00
+Reload ) Now that our logic is set up, we are going to open the RMCharacterListView file and inside of the overridden initializer we will set our viewModel's .delegate property equal to itself :
 
+    viewModel.delegate = self
+    viewModel.fetchCharacters()
+
+Note that we need to set the delegate before we call the Function.
+Note that the delegate property was not declared beforehand, we declared it after our RMCharacterListViewViewModelDelegate Protocol was declared.
+
+For context, RMCharacterListViewViewModel (the file that we are currently in) conforms to UICollectionViewDelegate, that is why we can open RMCharacterListView and set the instance of RMCharacterListViewViewModel that we have as the delegat of itself.
+
+Meaning that RMCharacterListView is responsible for displaying our data on the screen and RMCharacterListViewViewModel is responsible for providing the data to that screen.
+
+
+
+RMCharacterListViewViewModelDelegate ) To follow the Protocol-Delegate pattern, we are going to declare a protocol at the top of the file, the naming convention is the name of the file suffixed by Delegate.
+
+Inside of this Protocol, we are going to create a single Function called didLoadInitialCharacter().
+
+
+
+delegate ) Inside of our RMCharacterListViewViewModel Class, we are going to have a reference to our Protocol.
+Notice that we are declaring this Variable as weak, that is because we don't want our Class to retain a cyclical memory pointer.
+
+Doing so (creating a reference to the Protocol), requires that we give our RMCharacterListViewViewModelDelegate Protocol a Type of AnyObject because our Protocol needs to be Class bound so that we can capture it in a weak capacity.
+
+
+
+fetchCharacters ) Once we have our delegate property, we will use it inside of the fetchCharacters() Function to notify our delegate that the initial characters were loaded, which is done via the .didLoadInitialCharacters() Function.
+
+The .didLoadInitialCharacters() Function was declared in the RMCharacterListViewViewModelDelegate Protocol.
+
+We are going to call .didLoadInitialCharacters() on the Main Thread because it is going to trigger an update on our View.
+Given that we will use the Main Thread, we are going to wrap our call to .didLoadInitialCharacters() inside of a DispatchQueue :
+
+    DispatchQueue.main.async {
+        self?.delegate?.didLoadInitialCharacters()
+    }
+
+The next step is having our RMCharacterListView conform to the RMCharacterListViewViewModelDelegate Protocol.
 
 */

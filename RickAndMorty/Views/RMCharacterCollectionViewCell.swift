@@ -13,7 +13,9 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        // imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
+        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -39,24 +41,33 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
         contentView.backgroundColor = .secondarySystemBackground
         contentView.addSubviews(imageView, nameLabel, statusLabel)
         addConstraints()
-        
+        setUpLayer()
     }
     
     required init?(coder: NSCoder) {
         fatalError("Unsupported")
     }
     
+    private func setUpLayer() {
+        contentView.layer.cornerRadius = 8 // .cornerRadius for the UICollectionViewCell.
+        
+        contentView.layer.shadowColor = UIColor.secondaryLabel.cgColor
+        contentView.layer.cornerRadius = 4 // This .cornerRadius is specific to the shadow.
+        contentView.layer.shadowOffset = CGSize(width: -4, height: 4)
+        contentView.layer.shadowOpacity = 0.3
+    }
+    
     private func addConstraints() {
         NSLayoutConstraint.activate([
-            statusLabel.heightAnchor.constraint(equalToConstant: 40),
-            statusLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5),
-            statusLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
+            statusLabel.heightAnchor.constraint(equalToConstant: 30),
+            statusLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 7),
+            statusLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -7),
             statusLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -3),
             
-            nameLabel.heightAnchor.constraint(equalToConstant: 40),
-            nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 5),
-            nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -5),
-            nameLabel.bottomAnchor.constraint(equalTo: statusLabel.topAnchor, constant: -3),
+            nameLabel.heightAnchor.constraint(equalToConstant: 30),
+            nameLabel.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 7),
+            nameLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -7),
+            nameLabel.bottomAnchor.constraint(equalTo: statusLabel.topAnchor),
             
             imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
             imageView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
@@ -67,6 +78,11 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
         // imageView.backgroundColor = .systemGreen
         // nameLabel.backgroundColor = .red
         // statusLabel.backgroundColor = .orange
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        setUpLayer()
     }
     
     override func prepareForReuse() {
@@ -179,8 +195,40 @@ register ) Returning to our RMCharacterListView, we are going to register our RM
 
 deque ) Once we register the cell, we need to open our RMCharacterListViewViewModel and change the identifier for the cellForItemAt() Function.
 
+*/
+
+
+/*
+
+
+-> Showing Characters Section
+
+
+imageView ) The image we are receiving is not flushed to the top, so we are going to change its .contentMode from .scaleAspectFit to .scaleAspectFill.
+
+This change causes the image to overflow its bounds, so we need to set .clipsToBounds equal to true.
 
 
 
+cornerRadius ) To give our cells rounded corners, we are going to access our contentView's layer property and we are going to set its .cornerRadius to 8.
+
+These changes are made inside of our overridden initializer.
+
+
+
+shadow ) We will also add a shadow to our UICollectionViewCell.
+Note that we are using .cgColor because the GPU is more comfortable using this Type for expensive operations like creating shadows.
+
+
+
+setUpLayer ) We noticed that the shadow was not adapting to Dark Mode and Light Mode, so we abstracted it into its own private Function and to solve the problem by overriding the traitCollectionDidChange() Function.
+
+
+
+traitCollectionDidChange ) The traitCollectionDidChange() Function is overridden by using the super Function to call traitCollectionDidChange() and passing in the previousTraitCollection argument.
+
+Then, we call our setUpLayer() Function, that way the layer will be set up again whenever it changes.
+
+Note that traitCollectionDidChange() is invoked when the iOS interface environment changes.
 
 */

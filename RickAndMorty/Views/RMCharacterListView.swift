@@ -40,6 +40,7 @@ final class RMCharacterListView: UIView {
         
         addConstraints()
         spinner.startAnimating()
+        viewModel.delegate = self
         viewModel.fetchCharacters()
         setUpCollectionView()
     }
@@ -65,15 +66,17 @@ final class RMCharacterListView: UIView {
     private func setUpCollectionView() {
         collectionView.dataSource = viewModel
         collectionView.delegate = viewModel
-        
-        DispatchQueue.main.asyncAfter(deadline: .now()+2, execute: {
-            self.spinner.stopAnimating()
-            
-            self.collectionView.isHidden = false
-            UIView.animate(withDuration: 0.4) {
-                self.collectionView.alpha = 1
-            }
-        })
+    }
+}
+
+extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
+    func didLoadInitialCharacters() {
+        spinner.stopAnimating()
+        collectionView.isHidden = false
+        collectionView.reloadData() // Initial fetchCharacters()
+        UIView.animate(withDuration: 0.4) {
+            self.collectionView.alpha = 1
+        }
     }
 }
 
@@ -213,6 +216,36 @@ But before we start designing, we are going to create a UICollectionViewCell Coc
 
 register ) We are going to register RMCharacterCollectionViewCell as the cell of our collectionView.
 Note that we are using our static Constant as the cell's identifier.
+
+
+
+*/
+
+
+/*
+
+
+-> Showing Characters Section
+
+
+extension ) Inside of our exetnsion, we are going to conform to our RMCharacterListViewViewModelDelegate Protocol.
+To conform to the Protocol, we need to implement the didLoadInitialCharacters() Function.
+
+
+
+didLoadInitialCharacters ) RMCharacterListViewViewModel is calling the didLoadInitialCharacters() Function inside of its fetchCharacters() Function.
+
+When the fetchCharacters() Function runs, we will receive our initial characters.
+We want to notify our adopter, RMCharacterListView, that it needs to reload its data.
+To do so, we are going to call our collectionView's reloadData() Function.
+
+The reloadData() Function is provided to us through UICollectionView.
+
+Currently, we still have the code that we used for Testing in the previous section (Character List View Section), we will now delete that code from the setUpCollectionView() Function.
+
+Then, inside of our didLoadInitialCharacters() Function, we are going to stop animating the spinner, reload the data, set the isHidden property equal to false, and we want the collectionView to fade onto the screen.
+
+We are only going to call reloadData() for the initial fetch because we don't want to reload the whole view every time the user gets more Characters, we only want the Function to run when we retrieve the first batch of Characters.
 
 
 
