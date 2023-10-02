@@ -9,9 +9,11 @@ import UIKit
 
 protocol RMCharacterListViewViewModelDelegate: AnyObject {
     func didLoadInitialCharacters()
+    func didSelectCharacter(_ character: RMCharacter)
 }
 
 // struct RMCharacterListViewViewModel
+/// View Model to handle character list view logic
 final class RMCharacterListViewViewModel: NSObject {
     
     public weak var delegate: RMCharacterListViewViewModelDelegate?
@@ -32,12 +34,18 @@ final class RMCharacterListViewViewModel: NSObject {
     
     private var cellViewModels: [RMCharacterCollectionViewCellViewModel] = []
     
+    private var apiInfo: RMGetAllCharactersResponse.Info? = nil
+    
+    /// Fetch initial set of characters (20)
     public func fetchCharacters() {
         RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { [weak self] result in
             switch result {
             case .success(let responseModel):
                 let results = responseModel.results
+                let info = responseModel.info
+                
                 self?.characters = results
+                self?.apiInfo = info
                 DispatchQueue.main.async {
                     self?.delegate?.didLoadInitialCharacters()
                 }
@@ -46,7 +54,21 @@ final class RMCharacterListViewViewModel: NSObject {
             }
         }
     }
+    
+    /// Paginate if additional characters are needed
+    public func fetchAdditionalCharacters() {
+        // Fetch characters
+        
+    }
+    
+    public var shouldShowLoadMoreIndicator: Bool {
+        return apiInfo?.next != nil
+    }
+    
+    
 }
+
+// MARK: - CollectionView
 
 extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -74,6 +96,22 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
         
         return CGSize(width: width, height: width * 1.5)
         
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        let character = characters[indexPath.row]
+        delegate?.didSelectCharacter(character)
+    }
+}
+
+// MARK: - ScrollView
+
+extension RMCharacterListViewViewModel: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard shouldShowLoadMoreIndicator else {
+            return
+        }
     }
 }
 
@@ -386,5 +424,106 @@ Given that we will use the Main Thread, we are going to wrap our call to .didLoa
     }
 
 The next step is having our RMCharacterListView conform to the RMCharacterListViewViewModelDelegate Protocol.
+
+*/
+
+
+/*
+
+
+-> Character Detail Screen Section
+
+
+didSelectItemAt ) When we tap on a RMCharacterCollectionViewCell, we want notify our Controller that a detail page should open.
+Our collectionView's Delegate is where we will do that because we have extended our RMCharacterListViewViewModel so that it conforms to UICollectionViewDelegate.
+
+So far, we've implemented DataSource Function's in our extension such as numberOfItemsInSection(), cellForItemAt(), and sizeForItemAt().
+
+Now we are going to implement the didSelectItemAt() Function.
+The first step we take is deselecting the cell that was selected by calling the .deselectItem() Function.
+The .deselectItem() Function takes an input, we are going to pass the indexPath because that is the cell being selected.
+
+We then need to identify which object the user selected (which Character).
+To do that, we will access our RMCharacter Array (characters) and subscript it to find the RMCharacter object.
+To find the RMCharacter object, we need to place indexPath.row inside of the subscript.
+
+We can access the indexPath because it is an inbound argument to the didSelectItemAt() Function.
+
+
+
+Purpose ) The purpose of implementing the didSelectItemAt() Function is to access and hold on to the object selected.
+We need to hold on to that object because when we notify our Controller that it needs to open a detail page, the Controller will need to know which object will be displayed in the detail page.
+
+
+
+didSelectCharacter ) To notify RMCharacterViewController that it needs to open the detail page, we are going to use our RMCharacterListViewViewModelDelegate Protocol.
+
+Inside of the RMCharacterListViewViewModelDelegate Protocol (declared at the top of this file), we are going to declare a new Function called didSelectCharacter().
+
+The didSelectCharacter() Function is going to take an instance of RMCharacter, which is the Character that we are accessing and holding on to in our didSelectItemAt() Function.
+
+Once our didSelectCharacter() Function is declared in the Protocol, we are going to return to the didSelectItemAt() Function and call the didSelectCharacter() Function on our delegate.
+
+Note that the delegate Variable was declared at the top of the RMCharacterListViewViewModel Class.
+Notice how we are passing in the Character object that we accessed in the previous line :
+
+    collectionView.deselectItem(at: indexPath, animated: true)
+    let character = characters[indexPath.row]
+    delegate?.didSelectCharacter(character)
+
+Once this is implemented, RMCharacterListView will have a build error.
+Head over to the RMCharacterListView.
+
+
+
+shouldShowLoadMoreIndicator ) We need to know whether we should show the loading indicator on the screen.
+To do so, we are going to create a public Function called shouldShowLoadMoreIndicator() within our RMCharacterListViewViewModel Class.
+
+From the UIView's perspective, we need to know whether a loading indicator should be shown.
+We are going to leverage a footer to determine whether a loading indicator should be shown.
+
+Once we've created our apiInfo Variable, we are going to return Boolean value based on the following computation :
+
+    return apiInfo?.next != nil
+
+This translates to if the .next value of apiInfo is not nil, then proceed because we have another URL with the results of the next page of Characters, which would come from a URL like so :
+
+    https://rickandmortyapi.com/api/character/?page=2
+
+The value of our shouldShowLoadMoreIndicator is relevant because we are using it in our scrollViewDidScroll() Function within our guard statement.
+
+
+
+fetchAdditionalCharacters ) If shouldShowLoadMoreIndicator() returns a value of true, then we will need to show more characters.
+Our fetchAdditionalCharacters() Function is responsible for getting additional characters after we've retrieved the initial 20.
+
+
+
+UIScrollView ) To get the scroll position, we are going to accesse the position of our UIScrollView.
+Our RMCharacterListView's collectionView is a UICollectionView instance.
+
+UICollectionView inherits from UIScrollView.
+UIScrollView has a Delegate on it that lets us access information about the scroll poisiton of that ScrollView.
+
+
+
+scrollViewDidScroll ) Within another extension, we will have RMCharacterListViewViewModel adopt UIScrollViewDelegate.
+Inside of the extension, we are going to implement the scrollViewDidScroll() Function.
+
+Inside of the scrollViewDidScroll() Function, we are going to access the shouldShowMoreIndicator Variable.
+Our guard statement is checking that the shouldShowLoadeMoreIndicator is true, if it is not true then we are going to return out of the Function.
+
+
+
+apiInfo ) The RMGetAllCharactersResponse Type has an info property.
+Up to this point, we haven't used the info property, but we are going to use it now.
+Within the fetchCharacters() Function's .success case, we are going to save the responseModel.info to a Constant.
+
+We want to use the info Constant in scrollViewDidScroll() Function, so we are going to save the data that we are getting back from info inside of a private Variable called apiInfo.
+
+By default the apiInfo Variable is nil and it is a mutable Variable.
+Once we have our apiInfo Variable, we are going to return to the fetchCharacters() Function's .success case and we will save the data in stored by our info Constant inside apiInfo.
+
+
 
 */

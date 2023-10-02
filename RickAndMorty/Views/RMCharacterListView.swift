@@ -7,8 +7,14 @@
 
 import UIKit
 
+protocol RMCharacterListViewDelegate: AnyObject {
+    func rmCharacterListView(_ characterListView: RMCharacterListView, didSelectCharacter character: RMCharacter)
+}
+
 /// View that handles showing list of characters, loader, etc.
 final class RMCharacterListView: UIView {
+    
+    public weak var delegate: RMCharacterListViewDelegate?
     
     private let viewModel = RMCharacterListViewViewModel()
     
@@ -22,7 +28,7 @@ final class RMCharacterListView: UIView {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 10)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 10, bottom: 10, right: 10)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.isHidden = true
         collectionView.alpha = 0
@@ -70,6 +76,10 @@ final class RMCharacterListView: UIView {
 }
 
 extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
+    func didSelectCharacter(_ character: RMCharacter) {
+        delegate?.rmCharacterListView(self, didSelectCharacter: character)
+    }
+    
     func didLoadInitialCharacters() {
         spinner.stopAnimating()
         collectionView.isHidden = false
@@ -248,5 +258,89 @@ Then, inside of our didLoadInitialCharacters() Function, we are going to stop an
 We are only going to call reloadData() for the initial fetch because we don't want to reload the whole view every time the user gets more Characters, we only want the Function to run when we retrieve the first batch of Characters.
 
 
+
+*/
+
+
+/*
+
+
+-> Character Detail Screen
+
+
+Debugging ) When we ran the simulator, we saw that the cells at the bottom where being cut off.
+We fixed this problem by giving our collectionView's UIEdgeInsets object's bottom property a value of 10, before that it had a value of 0.
+
+
+
+RMCharacterListViewDelegate ) We are in the RMCharacterListView, and we need to get the notification that we are receiving from RMCharacterListViewViewModelDelegate's didSelectCharacter() Function to the RMCharacterViewController.
+
+To do so, we are going to continue using the Delegate-Protocol pattern.
+At the top of this file, we are going to create a Protocol called RMCharacterListViewDelegate.
+
+The Type of our Delegate interface will be AnyObject.
+The reasoning for this Type is so that we can hold on to it in a weak capacity.
+Notice that when we call our delegate instance, inside of the didSelectCharacter() Function, we are preceding the delegate with a question mark :
+
+    delegate?.rmCharacterListView(self, didSelectCharacter: character)
+
+We can preced our instance with a question mark because it is of Type AnyObject.
+
+Our Delegate interface will have a Function called rmCharacterListView().
+The rmCharacterListView() Function will take an argument of RMCharacterListView called rmCharacterListView.
+The second argument is of Type RMCharacter.
+
+We are following a naming convention when we choose the name of our Function and the names of our parameters.
+
+
+
+delegate ) Inside of our RMCharacterListView Class, we are going to declare a RMCharacterListViewDelegate instance called delegate.
+
+
+
+Conforming ) Currently, we have an error in our build because we need to implement the didSelectCharacter() Function that we declared in our RMCharacterListViewViewModelDelegate Protocol.
+
+We need to implement the didSelectCharacter() Function inside of our RMCharacterListView's extension in order to conform to the RMCharacterListViewViewModelDelegate Protocol.
+
+Inside of our didSelectCharacter() Function, we will access the delegate Variable that we created at the top of the RMCharacterListView Class and call our rmCharacterListView() Function to which we are going to pass in self for the first argument and we are going to pass in the RMCharacter object that we are receiving from our didSelectCharacter() Function.
+
+
+
+Call Stack ) RMCharacterListView adopts the RMCharacterListViewViewModelDelegate Protocol.
+The RMCharacterListViewViewModelDelegate Protocol has two Functions didLoadInitialCharacters() and didSelectCharacter().
+
+We are using the didLoadInitialCharacters() to show the initial Characters and hide the spinner.
+The didSelectCharacter() Function is used to pass the Character object, that our didSelectItemAt() Function accessed and saved, to the RMCharacterViewController, which is done by :
+
+    ( 1 ) We declared the didSelectCharacter() Function inside of the RMCharacterListViewViewModelDelegate Protocol.
+    
+    ( 2 ) Our RMCharacterListViewViewModel has an instance of RMCharacterListViewViewModelDelegate.
+    That instance is a Variable called delegate.
+
+    ( 3 ) Inside of the didSelectItemAt() Function, we are accessing and saving the RMCharacter that the user tapped on.
+    We are then passing that Character as the argument of our didSelectCharacter() Function which we declared in our RMCharacterListViewViewModelDelegate Protocol.
+
+    ( 4 ) The RMCharacter that the user tapped on is being accessed and saved in the didSelectItemAt() Function.
+    The RMCharactListView adopts the RMCharacterListViewViewModelDelegate Protocol.
+
+    Since RMCharacterListView adopts the RMCharacterListViewViewModelDelegate Protocol, we receive a build error because we need to implement the didSelectCharacter() Function within our RMCharacterListView extension.
+
+    ( 5 ) Before we receive the RMCharacter object from RMCharacterListViewViewModelDelegate, we created a new Protocol called RMCharacterListViewDelegate of Type AnyObject.
+
+    That Protocol has a Function called rmCharacterListView().
+    The rmCharacterListView() Function follows a naming convention.
+    The naming convention is setting the external parameter name of the second argument (character) as didSelectCharacter.
+
+    This naming convention helps our code be more readable because we will receive the RMCharacter object from our RMCharacterListViewViewModelDelegate's didSelectCharacter() Function.
+    
+    ( 6 ) After creating our RMCharacterListViewDelegate Protocol, we create an instance of it in our RMCharacterListView Class.
+    The instance of RMCharacterListViewDelegate is a Variable called delegate.
+
+    The delegate Variable is used inside of our extension to call the rmCharacterListView() Function.
+    The rmCharacterListView() Function takes the RMCharacter object that our RMCharacterListViewViewModelDelegate is passing to use through its didSelectCharacter() Function.
+
+    The purpose of implementing didSelectCharacter() in our extension is to take the RMCharacter object and pass it from the ViewModel to the View and finally to the Controller, which we will do next.
+
+Head over to the RMCharacterViewController file.
 
 */

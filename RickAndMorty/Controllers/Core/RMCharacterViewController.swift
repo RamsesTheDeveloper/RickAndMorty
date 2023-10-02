@@ -8,7 +8,7 @@
 import UIKit
 
 /// Controller to show and search for Characters
-final class RMCharacterViewController: UIViewController {
+final class RMCharacterViewController: UIViewController, RMCharacterListViewDelegate {
     
     private let characterListView = RMCharacterListView()
 
@@ -21,6 +21,7 @@ final class RMCharacterViewController: UIViewController {
     }
     
     private func setUpView() {
+        characterListView.delegate = self
         view.addSubview(characterListView)
         
         NSLayoutConstraint.activate([
@@ -29,6 +30,15 @@ final class RMCharacterViewController: UIViewController {
             characterListView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             characterListView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+    }
+    
+    // MARK: - RMCharacterListViewDelegate
+    
+    func rmCharacterListView(_ characterListView: RMCharacterListView, didSelectCharacter character: RMCharacter) {
+        let viewModel = RMCharacterDetailViewViewModel(character: character)
+        let detailVC = RMCharacterDetailViewController(viewModel: viewModel)
+        detailVC.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(detailVC, animated: true)
     }
 }
 
@@ -166,5 +176,63 @@ After running the simulator, notice that if we turn the simulator from protrait 
 
 setUpView ) To keep our code organized, we are going to remove our constraints from the viewDidLoad() Function and place it inside of a Function caled setUpView(), setUpView() will be called from viewDidLoad().
 
+
+*/
+
+
+/*
+
+
+-> Character Detail Screen Section
+
+
+Conforming ) Our RMCharacterViewController is going to conform to the RMCharacterListViewDelegate Protocol with the goal of receiving the RMCharacter that RMCharacterListViewViewModel's didSelectItemAt() Funtion accessed and saved.
+
+Our RMCharacterViewController has an RMCharacterListView instance called characterListView.
+Inside of the setUpView() Function we are going to give RMCharacterListView'a delegate Variable a value of self, which tells the compiler that our RMCharacterViewController will be the Delegate of our RMCharacterListView.
+
+This requires that our RMCharacterViewController Class adopt the RMCharacterListViewDelegate in its declaration.
+
+
+
+rmCharacterListView ) Adopting the RMCharacterListViewDelegate requires that we implement the rmCharacterListView() Function.
+Inside of the rmCharacterListView() Function, we are going to open the detail View Controller for that Character.
+
+For now, we are going to create a UIViewController Cocoa Touch Class called RMCharacterDetailViewController.
+
+That ViewController will go inside of the Controlls Group within a Group called Other.
+
+Within the rmCharacterListView() Function, we create an instance of RMCharacterDetailViewViewModel and pass in the character argument that we are receiving from the didSelectCharacter() Function.
+
+After the RMCharacterDetailViewController and its components are created, we create an instance of RMCharacterDetailViewController inside of the rmCharacterListView() Function and we pass in the viewModel that we created in the previous step.
+
+
+
+RMTabBarController ) Once we've created the viewModel and the RMCharacterDetailViewController instance, we can then push to that screen via navigationController's .pushViewController() Function.
+
+We have access to the .pushViewController() Function because we wrapped all of our ViewController instances in a UINavigationController when we initialized them in the RMTabBarController file.
+
+That is why we are able to call .pushViewController() on navigationController.
+
+We glossed over all of the Funtionality that UINavigationController gives us, but one of the abilities that it gives us is being able to slide one screen onto another, which is what we want for our detail screen.
+
+
+
+Stack ) Pushing and popping from a stack is similar to working with a ZStack where we are able to put one element above another at a given time.
+
+
+
+title ) The title on our detail screen is too large, so within the rmCharacterListView() Function, we are going to set the detailVC's .largeTitleDisplayMode equal to .never.
+
+
+
+Unlimited Scroll ) When we scroll down on our characterListView, we need two pieces of information :
+
+    ( 1 ) We need to know when the use has scrolled down to the bottom.
+
+    ( 2 ) We need to know if we have more Characters to download.
+
+We are going to add all of that business logic to our RMCharacterListViewViewModel.
+Head over to the RMCharacterListViewViewModel file.
 
 */

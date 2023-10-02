@@ -51,7 +51,7 @@ final class RMCharacterCollectionViewCell: UICollectionViewCell {
     private func setUpLayer() {
         contentView.layer.cornerRadius = 8 // .cornerRadius for the UICollectionViewCell.
         
-        contentView.layer.shadowColor = UIColor.secondaryLabel.cgColor
+        contentView.layer.shadowColor = UIColor.label.cgColor
         contentView.layer.cornerRadius = 4 // This .cornerRadius is specific to the shadow.
         contentView.layer.shadowOffset = CGSize(width: -4, height: 4)
         contentView.layer.shadowOpacity = 0.3
