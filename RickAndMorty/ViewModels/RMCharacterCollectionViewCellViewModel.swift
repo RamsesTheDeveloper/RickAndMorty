@@ -7,10 +7,21 @@
 
 import Foundation
 
-final class RMCharacterCollectionViewCellViewModel {
+final class RMCharacterCollectionViewCellViewModel: Hashable, Equatable {
+    
     public let characterName: String
     private let characterStatus: RMCharacterStatus
     private let characterImageUrl: URL?
+    
+    static func == (lhs: RMCharacterCollectionViewCellViewModel, rhs: RMCharacterCollectionViewCellViewModel) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(characterName)
+        hasher.combine(characterStatus)
+        hasher.combine(characterImageUrl)
+    }
     
     // MARK: - Initializer
     
@@ -120,5 +131,30 @@ We are going to precede the data that we receive from the API with a String.
 We will also make changes to our RMCharacterStatus Enum because the unknown String is not capitalized as of now.
 
 Once that is done, we are going to use .text instead of .rawValue for our characterStatusText Variable.
+
+*/
+
+
+/*
+
+
+-> Character Pagination Section
+
+
+Hashable ) Our RMCharacterListViewViewModel was not filtering out instances of RMCharacter correctly, so we are going to make RMCharacterCollectionViewCellViewModel Hashable to streamline that process.
+
+Inside of our Class, we are going to declare our hash() Function.
+Within the hash() Function, we are going to combine the Character's status, name, and image URL in order to assign a unique hash value to the ViewModel that holds that Character instance at the time of its creation.
+
+
+
+Equatable ) Working with Hashable requires that we also wrok with Equatable.
+To conform to Equatable, we need to implement its equal Function, which is represented by two equal signs.
+
+Head over to RMCharacterListViewViewModel.
+
+
+
+
 
 */

@@ -9,6 +9,7 @@ import UIKit
 
 protocol RMCharacterListViewViewModelDelegate: AnyObject {
     func didLoadInitialCharacters()
+    func didLoadMoreCharacters(with newIndexPaths: [IndexPath])
     func didSelectCharacter(_ character: RMCharacter)
 }
 
@@ -22,6 +23,7 @@ final class RMCharacterListViewViewModel: NSObject {
     
     private var characters: [RMCharacter] = [] {
         didSet {
+            print("Creating ViewModels")
             for character in characters {
                 let viewModel = RMCharacterCollectionViewCellViewModel(
                     characterName: character.name,
@@ -29,7 +31,10 @@ final class RMCharacterListViewViewModel: NSObject {
                     characterImageUrl: URL(string: character.image)
                 )
                 
-                cellViewModels.append(viewModel)
+                // If the viewModel created is not contained in our Array, then insert it.
+                if !cellViewModels.contains(viewModel) {
+                    cellViewModels.append(viewModel)
+                }
             }
         }
     }
@@ -58,11 +63,55 @@ final class RMCharacterListViewViewModel: NSObject {
     }
     
     /// Paginate if additional characters are needed
-    public func fetchAdditionalCharacters() {
+    public func fetchAdditionalCharacters(url: URL) {
+        guard !isLoadingMoreCharacters else {
+            return
+        }
         isLoadingMoreCharacters = true
-        print("Fetch Function is running")
-        // Fetch characters
+        print("Fetching more characters")
+        guard let request = RMRequest(url: url) else {
+            isLoadingMoreCharacters = false
+            print("Failed to create RMRequest instance")
+            return
+        }
         
+        print("Fetch Function is running")
+        RMService.shared.execute(
+            request, 
+            expecting: RMGetAllCharactersResponse.self) { [weak self] result in
+                guard let strongSelf = self else {
+                    return
+                }
+                switch result {
+                case .success(let responseModel):
+                    let moreResults = responseModel.results
+                    let info = responseModel.info
+                    strongSelf.apiInfo = info
+                    
+                    // Helps calculate the collectionView's indexPath
+                    let originalCount = strongSelf.characters.count
+                    let newCount = moreResults.count
+                    let total = originalCount + newCount
+                    
+                    let startingIndex = total - newCount
+                    
+                    // Create an Array of IndexPath with the given range, transform it, and return an IndexPath with a row and sec
+                    let indexPathsToAdd: [IndexPath] = Array(startingIndex..<(startingIndex+newCount)).compactMap {
+                        return IndexPath(row: $0, section: 0)
+                    }
+                    
+                    // print(indexPathsToAdd)
+                    
+                    strongSelf.characters.append(contentsOf: moreResults)
+                    DispatchQueue.main.async {
+                        strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
+                        strongSelf.isLoadingMoreCharacters = false
+                    }
+                case .failure(let failure):
+                    print(String(describing: failure))
+                    strongSelf.isLoadingMoreCharacters = false
+                }
+            }
     }
     
     public var shouldShowLoadMoreIndicator: Bool {
@@ -137,16 +186,24 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
 
 extension RMCharacterListViewViewModel: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard shouldShowLoadMoreIndicator, !isLoadingMoreCharacters else {
+        guard shouldShowLoadMoreIndicator,
+              !isLoadingMoreCharacters,
+              !cellViewModels.isEmpty,
+              let nextUrlString = apiInfo?.next,
+              let url = URL(string: nextUrlString) else {
             return
         }
         
-        let offset = scrollView.contentOffset.y
-        let totalContentHeight = scrollView.contentSize.height
-        let totalScrollViewFixedHeight = scrollView.frame.size.height
-        
-        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
-            fetchAdditionalCharacters()
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let totalContentHeight = scrollView.contentSize.height
+            let totalScrollViewFixedHeight = scrollView.frame.size.height
+            
+            if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+                self?.fetchAdditionalCharacters(url: url)
+            }
+            
+            t.invalidate()
         }
     }
 }
@@ -778,5 +835,204 @@ Finally, we will set the value to true if the offset is greater than or equal to
 
 
 Refactor ) We no longer need to print to the console, so we are going to call the fetchAdditionalCharacters() Function within our scrollViewDidScroll() Function's If Statement and we are going to take the isLoadingMoreCharacters equal to true code and move it into the fetchAdditionalCharacters() Function.
+
+*/
+
+
+/*
+
+
+-> Character Pagination Section
+
+
+fetchAdditionalCharacters ) Currently, our scrollViewDidScroll() Function is calling our fetchAdditionalCharacters() Function, but our fetchAdditionalCharacters() Function can't run because we don't have a URL set up that we can pass into RMService's execute() Function.
+
+The execute() Function also asks for the expecting Type and the Type that will be used in the completion handler.
+The first argument that execute() asks for is the URL, so we will modify our fetchAdditionalCharacters() Function signature to take in an argument of Type URL.
+
+This chaneg will require that scrollViewDidScrolls() invocation of fetchAdditionalCharacters() provides an argument of Type URL.
+
+
+
+nextUrlString ) We will also take apiInfo's .next value and save it to a Constant called nextUrlString, we will then use that Constant to create a URL instance that we will ultimately pass into our fetchAdditionalCharacters() Function :
+
+    guard shouldShowLoadMoreIndicator,
+        !isLoadingMoreCharacters,
+        let nextUrlString = apiInfo?.next,
+        let url = URL(string: nextUrlString) else {
+        return
+    }
+
+    let offset = scrollView.contentOffset.y
+    let totalContentHeight = scrollView.contentSize.height
+    let totalScrollViewFixedHeight = scrollView.frame.size.height
+
+    if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+        fetchAdditionalCharacters(url: url)
+    }
+
+Once that's done, head over to the RMRequest file.
+
+
+
+RMRequest ) Once we've created our Convenience Initializers in our RMRequest file, we can now create our RMRequest instance within the fetchAdditionalCharacters() Function.
+
+The URL instance that we are getting from scrollViewDidScroll() can potentially be nil, so to avoid problems we are going to use a Guard Let Statement.
+
+We will also set the value of isLoadingMoreCharacters to false if we are unable to create our RMRequest instance.
+
+After running this code :
+
+    public func fetchAdditionalCharacters(url: URL) {
+        isLoadingMoreCharacters = true
+        print("Fetching more characters")
+        guard let request = RMRequest(url: url) else {
+            isLoadingMoreCharacters = false
+            print("Failed to create RMRequest instance")
+            return
+        }
+
+        print("Fetch Function is running")
+        RMService.shared.execute(
+        request,
+        expecting: RMGetAllCharactersResponse.self) { result in
+            switch result {
+            case .success(let success):
+                print(String(describing: success))
+            case .failure(let failure):
+                print(String(describing: failure))
+            }
+        }
+    }
+
+We saw that fetchAdditionalCharacters() is running even when we don't scroll to the bottom of the screen.
+
+
+
+Timer ) To fix that problem, we go to we will add a new check to our scrollViewDidScroll() Function's Guard Statement :
+
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        guard shouldShowLoadMoreIndicator,
+            !isLoadingMoreCharacters,
+            !cellViewModels.isEmpty,
+            let nextUrlString = apiInfo?.next,
+            let url = URL(string: nextUrlString) else {
+            return
+        }
+
+        Timer.scheduledTimer(withTimeInterval: 0.2, repeats: false) { [weak self] t in
+            let offset = scrollView.contentOffset.y
+            let totalContentHeight = scrollView.contentSize.height
+            let totalScrollViewFixedHeight = scrollView.frame.size.height
+
+            if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+                self?.fetchAdditionalCharacters(url: url)
+            }
+
+        t.invalidate()
+        }
+    }
+
+This solves the issue because if our Array of RMCharacterCollectionViewCellViewModel isEmpty, then there is no reason to check if we are at the bottom because we are still loading the initial batch of data.
+
+We will also implement a Timer, we won't repeat it, and we will capute self in a weak capacity.
+Timers are commonly used to delay an action when a user is interacting with the application.
+At the bottom, we tell the timer to invalidate itself, which is to say clean yourself up.
+
+We want wrap our fetchAdditionalCharacters() Function in a Timer because we want that Function to run after the inital Characters have been loaded via the fetchCharacters() Function.
+
+Another base that the Timer covers is ensuring that the offset is calculated correctly because our cells have a height that adds to the total.
+
+That code causes an error, the error is that fetchAdditionalCharacters() is called over and over.
+So, to fix that, we are going to check that isLoadingMoreCharacters is false before we set it to true :
+
+    guard !isLoadingMoreCharacters else {
+        return
+    }
+    isLoadingMoreCharacters = true
+
+
+
+
+Once that's done, we are going to capture self in a weak capacity and we will append the additional Characters to our characters Array within fetchAddtionalCharacters() execute() Function :
+
+    self?.characters.append(contentsOf: moreResults)
+
+We don't want to override characters like we did for fetchCharacters(), instead, in the above code, we are appending to the characters Array.
+
+We also need to set isLoadingMoreCharacters equal to false.
+
+Notice that wrote this line of code in both cases :
+
+    self?.isLoadingMoreCharacters = false
+
+We wrote this line of code in both cases, instead of before the switch statement to account for a situation where our application will need to fetch more data.
+
+
+
+Delegate ) Once the Function is set up, we need to add a new Function to our RMCharacterListViewViewModelDelegate.
+We want to know how many cells we will insert to the collectionView, so it will have a count parameter.
+
+Once we've created the Function in RMCharacterListViewViewModelDelegate, we are going to invoke it inside of our fetchAdditionalCharacters() Function's .success case.
+
+Doing so is nullable so we are going to use nil coalesce zero.
+Notice that we are accessing the amount of characters that our characters Array has after we append moreResults to the Array.
+
+Head over to the RMCharacterListView file.
+
+We returned from RMCharacterListView because as we were adding cells to the collectionView, we realized that we will need an indexPath in order to understand at which indexPath we need to insert our new Characters at.
+
+The didLoadMoreCharacters() Function is being called in the .success case, so we will need to calculate the indexPath there.
+
+
+
+strongSelf ) Unwrapping self over and over is repetitive, so we are going to unwrap at the top of the didLoadMoreCharacters() Function's execute() Function.
+
+
+
+indexPathsToAdd ) We created a Constant called indexPathToAdd, so that we know how many elements we have in the collectionView from the startingIndex through the startingIndex and the newCount.
+
+Once our indexPathsToAdd Constant is ready, we are going to pass it into the didLoadMoreCharacters() Function within our fetchAdditonalCharacters() Function's .success case.
+
+
+
+Debugging ) Our application crashed because we are duplicating the initial viewModels inside of the didSet property setter.
+To referesh, the didSet property setter is responsible for appending to our viewModel whenever an instance of RMCharacter changes in the RMCharacter object :
+
+    private var characters: [RMCharacter] = [] {
+        didSet {
+        print("Creating ViewModels")
+            for character in characters {
+                let viewModel = RMCharacterCollectionViewCellViewModel(
+                characterName: character.name,
+                characterStatus: character.status,
+                characterImageUrl: URL(string: character.image)
+                )
+
+                cellViewModels.append(viewModel)
+            }
+        }
+    }
+
+To fix this issue, we will only add ViewModels where the name of the RMCharacter instance is not already contained in the Array :
+
+    for character in characters where !cellViewModels.contains(where: { $0.characterName == character.name })
+
+In other words, if the ViewModel already exists with the current Character's name that we are about to Loop over, then don't Loop over it.
+
+This assumes that each character will have a unique name.
+
+The other reason for the crash is that we did not handle the queryParameters of our RMRequest's Convenience Initializer.
+Head over to the RMRequest file.
+
+
+
+Hashable ) We are still crashing because our filter is still including Character objects with the same name.
+Using Hashable is a better approach because we can
+
+To use Hashable, we will have our RMCharacterCollectionViewCellViewModel adopt it in its declaration.
+Head over to the RMCharacterCollectionViewCellViewModel file.
+
+Once Hashable and Equatable have been adopted, we can now update our filter.
 
 */

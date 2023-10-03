@@ -96,6 +96,12 @@ extension RMCharacterListView: RMCharacterListViewViewModelDelegate {
             self.collectionView.alpha = 1
         }
     }
+    
+    func didLoadMoreCharacters(with newIndexPaths: [IndexPath]) {
+        collectionView.performBatchUpdates {
+            self.collectionView.insertItems(at: newIndexPaths)
+        }
+    }
 }
 
 /*
@@ -370,5 +376,32 @@ To do so, we need to implement the DataSource functionality for whether or not R
 Head over to the RMCharacterListViewViewModel file.
 
 
+
+*/
+
+
+/*
+
+
+-> Character Pagination Section
+
+
+didLoadMoreCharacters ) We created a new Function in our RMCharacterListViewViewModelDelegate that our RMCharacterListView will now need to implement in order to conform to the Protocol.
+
+In the didLoadMoreCharacters() Function, we want to tell the collectionView to add more cells.
+That's done by performing batch updates, so we are going to call the .performBatchUpdates() Function on our collectionView.
+
+When we insert our cells, we want to insert them at a particular index path, so we will need to create a Collection of index paths.
+This means that we need to make changes to the didLoadMoreCharacters() Function's signature in the RMCharacterListViewViewModelDelegate Protocol.
+
+Head over to the RMCharacterListViewViewModel file.
+
+
+
+newIndexPaths ) Our didLoadMoreCharacters() Function is sending over objects from our startingIndex through objects in newCount.
+
+newCount represents the objects that we received from fetchAdditionalCharacters() Function's execute() Function.
+
+We 
 
 */
