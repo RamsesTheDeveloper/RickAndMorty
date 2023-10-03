@@ -18,6 +18,8 @@ final class RMCharacterListViewViewModel: NSObject {
     
     public weak var delegate: RMCharacterListViewViewModelDelegate?
     
+    private var isLoadingMoreCharacters = false
+    
     private var characters: [RMCharacter] = [] {
         didSet {
             for character in characters {
@@ -57,11 +59,14 @@ final class RMCharacterListViewViewModel: NSObject {
     
     /// Paginate if additional characters are needed
     public func fetchAdditionalCharacters() {
+        isLoadingMoreCharacters = true
+        print("Fetch Function is running")
         // Fetch characters
         
     }
     
     public var shouldShowLoadMoreIndicator: Bool {
+        // return false
         return apiInfo?.next != nil
     }
     
@@ -90,6 +95,29 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
         return cell
     }
     
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionFooter,
+              let footer = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier,
+                for: indexPath
+              ) as? RMFooterLoadingCollectionReusableView else {
+            fatalError("Unsupported")
+        }
+        
+        footer.startAnimating()
+        return footer
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForFooterInSection section: Int) -> CGSize {
+        
+        guard shouldShowLoadMoreIndicator else {
+            return .zero
+        }
+        
+        return CGSize(width: collectionView.frame.width, height: 100)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let bounds = UIScreen.main.bounds
         let width = (bounds.width-30)/2
@@ -109,8 +137,16 @@ extension RMCharacterListViewViewModel: UICollectionViewDataSource, UICollection
 
 extension RMCharacterListViewViewModel: UIScrollViewDelegate {
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        guard shouldShowLoadMoreIndicator else {
+        guard shouldShowLoadMoreIndicator, !isLoadingMoreCharacters else {
             return
+        }
+        
+        let offset = scrollView.contentOffset.y
+        let totalContentHeight = scrollView.contentSize.height
+        let totalScrollViewFixedHeight = scrollView.frame.size.height
+        
+        if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+            fetchAdditionalCharacters()
         }
     }
 }
@@ -525,5 +561,222 @@ By default the apiInfo Variable is nil and it is a mutable Variable.
 Once we have our apiInfo Variable, we are going to return to the fetchCharacters() Function's .success case and we will save the data in stored by our info Constant inside apiInfo.
 
 
+
+*/
+
+
+/*
+
+
+-> Pagination Indicator Section
+
+
+Footer ) We are going to create a UICollectionReusableView Cocoa Touch Class called RMFooterLoadingCollectionReusableView within our Views Group.
+
+Long, descriptive names are better than abbreviations most of the time.
+Head over to the RMFooterLoadingCollectionReusableView file.
+
+
+
+viewForSupplementaryElementOfKind ) To dequeue our UICollectionReusableView from the collectionView, we need to specify the size of the footer as well as the Function which will dequeue the footer itself.
+
+Inside of our CollectionView extension, we are going to implement the viewForSupplementaryElementOfKind() Function.
+We don't have a use for the indexPath, but this Function is relevant because it returns a UICollectionResuableView.
+
+We will use a Guard Statement to ensure that the UICollectionReusableView being returned is a footer :
+
+    guard kind == UICollectionView.elementKindSectionFooter else {
+        return UICollectionReusableView()
+    }
+
+Otherwise, we are going to return a base UICollectionReusableView.
+
+If our logic is correct, then we are going to dequeue that particular View that we created.
+This is done by calling .dequeueResuableSupplementaryView() on our collectionView and saving the result to a footer Constant.
+
+Finally, we return the footer Constant.
+
+
+
+referenceSizeForFooterInsection ) The referenceSizeForFooterInsection() Function specifies the size of our footer, which is the footer that is being returned by viewForSupplementaryElementOfKind().
+
+To start, we are going to set the with of the CGSize object to that of the collectionView and hard code the height to 100.
+
+
+
+shouldShowLoadMoreIndicator ) Currently, our Guard Statement is only testing for the Type of UICollectionView, but we also want to test that shouldShowLoadMoreIndicator is true.
+
+shouldShowLoadMoreIndicator is a public Variable that we declared in this file.
+
+
+
+Debugging ) The current code causes a crash.
+Our simulator crashed because we didn't dequeue UICollectionReusableView correctly within the viewForSupplementaryElementOfKind() Function.
+
+The compiler isn't content because we instantiated (shown in our Guard Statement excerpt above) an instance of UICollectionReusableView instead of returning it appropriately.
+
+To statisfy the compiler, we are going to return a fatalError() within our viewForSupplementaryElementOfKind() Function's Guard Statement, and in the referenceSizeForFooterInsection() Function we are going to set the size of the footer equal to .zero if shouldShowLoadMoreIndicator is not true.
+
+Setting the size of our footer equal to .zero makes it invisible.
+
+When we run the application, it works now, we see that the backgroundColor of RMFooterLoadingCollectionReusableView is no longer being returned because we set the size of footer equal to .zero.
+
+
+
+shouldShowLoadMoreIndicator ) Note that in order to test the above logic, we had to set the value of our shouldShowLoadMoreIndicator equal to false :
+
+    public var shouldShowLoadMoreIndicator: Bool {
+        return false //apiInfo?.next != nil
+    }
+
+The commented out code is show the blue backgroundColor for RMFooterLoadingCollectionReusableView.
+The size for that background color can be found in the referenceSizeForFooterInsection() Function :
+
+    return CGSize(width: collectionView.frame.width, height: 100)
+
+
+
+spinner ) To show our spinner, we are going to cast our footer Constant to an instance of RMFooterLoadingCollectionResuableView within the viewForSupplementaryElementOfKind() Function.
+
+Then, we are going to call the .startAnimating() Function, which we defined in the RMFooterLoadingCollectionResuableView Class.
+We have access to the .startAnimating() Class because we casted our footer Constant to an instance of RMFooterLoadingCollectionResuableView.
+
+However, now our footer Constant is an Optional, so we are going to make our footer Constant a Guard Let Statement :
+
+    let footer = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier,
+            for: indexPath
+        ) as? RMFooterLoadingCollectionReusableView
+        footer?.startAnimating()
+
+    return footer
+
+The better approach is to combine both of our Guard Statements into one :
+
+    guard kind == UICollectionView.elementKindSectionFooter else {
+        fatalError("Unsupported")
+    }
+
+    guard let footer = collectionView.dequeueReusableSupplementaryView(
+        ofKind: kind,
+        withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier,
+        for: indexPath
+    ) as? RMFooterLoadingCollectionReusableView
+    footer?.startAnimating() else {
+        fatalError("Unsupported")
+    }
+
+    return footer
+
+
+
+Debugging ) We had a small issue with the spinner not being shown on the simulator.
+The issue was that we did not set the value of apiInfo, within shouldShowLoadMoreIndicator, equal to not nil.
+
+
+
+scrollViewDidScroll ) Once our indicator is showing, we will return to the scrollViewDidScroll() Function and access the scrollView.contentOffset.y and save it in the offset Constant.
+
+We will also get the scrollView.contentSize.height and save it in the totalContentHeight Constant.
+Note that the content is inside of the scrollView, which is to say that the cells that populate inside of the contentView have a height and the totalContentHeight Constant is storing that height.
+
+We accessed the scrollView.frame.size.height and saved it to the totalScrollViewFixedHeight Constant, this is the height of the entire scrollView.
+
+When we run the simulator, we get back the following :
+
+    Offset: 11.66...
+    totalContentHeight: 2922.5
+    totalScrollViewFixedHeight: 619.33..
+
+    Offset: 21.66...
+    totalContentHeight: 2922.5
+    totalScrollViewFixedHeight: 654.33...
+
+    Offset: 31.0
+    totalContentHeight: 2922.5
+    totalScrollViewFixedHeight: 671.33...
+
+    Offset: 36.33...
+    totalContentHeight: 2922.5
+    totalScrollViewFixedHeight: 671.33...
+
+These numbers printed because we were scrolling in the simulator.
+Notice that the totalContentHeight stayed the same, that's because the cells do not change shape.
+
+Also notice that the offset changes the totalScrollViewFixedHeight, that's because our NavigationController has a NavigationBar that shrinks whenever the user scrolls past a certain offset.
+
+However, after a certain offset value is passed, the totalScrollViewHeight stays consistent.
+This is the code that we ran in the scrollViewDidScroll() Function :
+
+    guard shouldShowLoadMoreIndicator else {
+        return
+    }
+
+    let offset = scrollView.contentOffset.y
+    let totalContentHeight = scrollView.contentSize.height
+    let totalScrollViewFixedHeight = scrollView.frame.size.height
+
+    print("Offset: \(offset)")
+    print("totalContentHeight: \(totalContentHeight)")
+    print("totalScrollViewFixedHeight: \(totalScrollViewFixedHeight)")
+
+When we scroll to the bottom, our offset prints our 2251.
+
+
+
+If ) With an If Statement, we are going to take the height of the content and subtract the height of the content by the fixed height and subtract it by another 120.
+
+We are subtracting an additional 120 because our spinner has a height of 100, which is adding to the total height and an additional 20 for the purpose of a buffer.
+If the value of that arithmetic operation is greater than or equal to the offset, then we will print out :
+
+    guard shouldShowLoadMoreIndicator else {
+        return
+    }
+
+    let offset = scrollView.contentOffset.y
+    let totalContentHeight = scrollView.contentSize.height
+    let totalScrollViewFixedHeight = scrollView.frame.size.height
+
+    if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+        print("Should start fetching more")
+    }
+    
+
+This works because we already know that we have more Characters to load because that is what we check first in the scrollViewDidScroll() Function.
+
+We added a breakpoint to show that our code is running as expected.
+With a breakpoint, if the path of execution reaches the breakpoint, then our simulator will stop running and we will return to Xcode, which represents a successful exit.
+
+
+
+Dynamic Updating ) Our logic within the scrollViewDidScroll() Function was implemented well because as we load more content, the contentOffset and contentSize.height will be dynamically updated and managed by the ScrollView (collectionView).
+
+
+
+Edge Case ) Currently, we are printing the "Should start fetching more" String over and over in the simulator.
+Those prints represent the device doing unnecessary work, that work being making a call to the API over and over.
+
+To control the amount of times our code executes a call, we are going to create a private Variable called isLoadingMoreCharacters of Type Bool, by default the value of isLoadMoreCharacters will be false.
+
+Then, we are going to test, with our Guard Statement, that the isLoadingMoreCharacters indicator is not true.
+Finally, we will set the value to true if the offset is greater than or equal to the arithmetic operation we implemented :
+
+    guard shouldShowLoadMoreIndicator, !isLoadingMoreCharacters else {
+        return
+    }
+
+    let offset = scrollView.contentOffset.y
+    let totalContentHeight = scrollView.contentSize.height
+    let totalScrollViewFixedHeight = scrollView.frame.size.height
+
+    if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
+        print("Should start fetching more")
+        isLoadingMoreCharacters = true
+    }
+
+
+
+Refactor ) We no longer need to print to the console, so we are going to call the fetchAdditionalCharacters() Function within our scrollViewDidScroll() Function's If Statement and we are going to take the isLoadingMoreCharacters equal to true code and move it into the fetchAdditionalCharacters() Function.
 
 */

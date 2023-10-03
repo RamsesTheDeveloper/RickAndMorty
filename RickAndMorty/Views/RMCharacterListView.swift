@@ -34,8 +34,16 @@ final class RMCharacterListView: UIView {
         collectionView.alpha = 0
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         // collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
-        collectionView.register(RMCharacterCollectionViewCell.self,
-                                forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier)
+        collectionView.register(
+            RMCharacterCollectionViewCell.self,
+            forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier
+        )
+        
+        collectionView.register(
+            RMFooterLoadingCollectionReusableView.self,
+            forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter,
+            withReuseIdentifier: RMFooterLoadingCollectionReusableView.identifier
+        )
         return collectionView
     }()
     
@@ -342,5 +350,25 @@ The didSelectCharacter() Function is used to pass the Character object, that our
     The purpose of implementing didSelectCharacter() in our extension is to take the RMCharacter object and pass it from the ViewModel to the View and finally to the Controller, which we will do next.
 
 Head over to the RMCharacterViewController file.
+
+*/
+
+/*
+
+
+-> Pagination Indicator Section
+
+
+register ) Within our collectionView computed property, we are going to invoke .register(_ viewClass: ...) and we are going to pass in RMFooterLoadingCollectionReusableView.self.
+
+The argument for the forSupplementaryViewOfKind parameter will be UICollectionView.elementKindSectionFooter.
+This line of code resgisters a footer that shows up at the bottom of our collectionView.
+
+If we want to dequeue our UICollectionReusableView, then we will need to inform the collectionView.
+To do so, we need to implement the DataSource functionality for whether or not RMFooterLoadingCollectionReusableView should be shown, and that logic resiges in the RMCharacterListViewViewModel.
+
+Head over to the RMCharacterListViewViewModel file.
+
+
 
 */
