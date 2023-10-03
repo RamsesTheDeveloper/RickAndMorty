@@ -1034,5 +1034,6 @@ To use Hashable, we will have our RMCharacterCollectionViewCellViewModel adopt i
 Head over to the RMCharacterCollectionViewCellViewModel file.
 
 Once Hashable and Equatable have been adopted, we can now update our filter.
+Head over to the RMCharacterCollectionViewCellViewModel file.
 
 */

@@ -13,16 +13,6 @@ final class RMCharacterCollectionViewCellViewModel: Hashable, Equatable {
     private let characterStatus: RMCharacterStatus
     private let characterImageUrl: URL?
     
-    static func == (lhs: RMCharacterCollectionViewCellViewModel, rhs: RMCharacterCollectionViewCellViewModel) -> Bool {
-        return lhs.hashValue == rhs.hashValue
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(characterName)
-        hasher.combine(characterStatus)
-        hasher.combine(characterImageUrl)
-    }
-    
     // MARK: - Initializer
     
     init(characterName: String, characterStatus: RMCharacterStatus, characterImageUrl: URL?) {
@@ -43,15 +33,19 @@ final class RMCharacterCollectionViewCellViewModel: Hashable, Equatable {
             return
         }
         let request = URLRequest(url: url)
-        let task = URLSession.shared.dataTask(with: request) { data, _, error in
-            guard let data = data, error == nil else {
-                completion(.failure(error ?? URLError(.badServerResponse)))
-                return
-            }
-            
-            completion(.success(data))
-        }
-        task.resume()
+        RMImageLoader.shared.downloadImage(url: url, completion: completion)
+    }
+    
+    // MARK: - Hashable and Equatable
+    
+    static func == (lhs: RMCharacterCollectionViewCellViewModel, rhs: RMCharacterCollectionViewCellViewModel) -> Bool {
+        return lhs.hashValue == rhs.hashValue
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(characterName)
+        hasher.combine(characterStatus)
+        hasher.combine(characterImageUrl)
     }
 }
 
@@ -152,6 +146,21 @@ Equatable ) Working with Hashable requires that we also wrok with Equatable.
 To conform to Equatable, we need to implement its equal Function, which is represented by two equal signs.
 
 Head over to RMCharacterListViewViewModel.
+
+
+*/
+
+
+/*
+
+
+-> Image Loader Section
+
+
+Currently, our fetchImage() Function houses all of the logic needed to download an image.
+As of now, the Function is used in the RMCharacterCollectionViewCell Class.
+
+We want to resue that logic in other places, so we are going to copy it and paste it inside of the RMImageLoader Class.
 
 
 
