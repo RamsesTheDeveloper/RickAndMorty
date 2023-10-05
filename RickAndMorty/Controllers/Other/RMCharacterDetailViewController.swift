@@ -35,6 +35,9 @@ final class RMCharacterDetailViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapShare))
         addConstraints()
         // viewModel.fetchCharacterData()
+        
+        detailView.collectionView?.delegate = self
+        detailView.collectionView?.dataSource = self
     }
     
     @objc
@@ -49,6 +52,20 @@ final class RMCharacterDetailViewController: UIViewController {
             detailView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             detailView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+    }
+}
+
+// MARK: - CollectionView
+
+extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        20
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+        cell.backgroundColor = .systemYellow
+        return cell
     }
 }
 
@@ -140,6 +157,27 @@ The fetchCharacterData() Function will be called from the viewDidLoad() Function
  There was no point in building out the fetchCharacterData() Function because our RMCharacterDetailViewViewModel is already receiving an RMCharacter instance from its initializer, so we will comment out the call to the Function from the viewDidLoad() Function.
 
 
+
+
+
+*/
+
+
+/*
+
+
+-> Compositional Layout Section
+
+
+DataSource/Delegate ) Towards the bottom of the file, we are going to extend the RMCharacterDetailViewController Class.
+After we'll have the Controller adopt the UICollectionViewDataSource and UICollectionViewDelegate Protocols.
+
+For now, within the extension, we are going to call the numberOfItemsInSection() Function and return 20.
+Then, we are going to call the cellForItemAt() Function and create a default cell like we did in previous section.
+
+Head over to the RMCharacterDetailView file.
+
+Returning from the RMCharacterDetailView file, within the viewDidLoad() Function, we are going to set our collectionView's .delegate property equal to self (RMCharacterDetailViewController Class) and we will do the same for the .dataSource.
 
 
 
