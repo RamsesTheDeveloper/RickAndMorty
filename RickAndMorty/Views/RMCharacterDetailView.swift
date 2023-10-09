@@ -12,6 +12,8 @@ final class RMCharacterDetailView: UIView {
 
     public var collectionView: UICollectionView?
     
+    private let viewModel: RMCharacterDetailViewViewModel
+    
     private let spinner: UIActivityIndicatorView = {
         let spinner = UIActivityIndicatorView(style: .large)
         spinner.hidesWhenStopped = true
@@ -21,7 +23,8 @@ final class RMCharacterDetailView: UIView {
     
     // MARK: - Initializer
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, viewModel: RMCharacterDetailViewViewModel) {
+        self.viewModel = viewModel
         super.init(frame: frame)
         translatesAutoresizingMaskIntoConstraints = false
         backgroundColor = .systemBackground
@@ -66,6 +69,66 @@ final class RMCharacterDetailView: UIView {
     }
     
     private func createSection(for sectionIndex: Int) -> NSCollectionLayoutSection {
+        
+        let sectionTypes = viewModel.sections
+        
+        switch sectionTypes[sectionIndex] {
+        case .photo:
+            return createPhotoSectionLayout()
+        case .information:
+            return createInfoSectionLayout()
+        case .episodes:
+            return createEpisodeSectionLayout()
+        }
+    }
+    
+    private func createPhotoSectionLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10)
+        
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(150)
+            ),
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        return section
+    }
+    
+    private func createInfoSectionLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10)
+        
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(150)
+            ),
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        return section
+    }
+    
+    private func createEpisodeSectionLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(
             layoutSize: NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1.0),
@@ -203,6 +266,73 @@ NSDirectionalEdgeInsets ) Returning from the RMCharacterDetailViewController, we
 The NSDirectionalEdgeInsets splits our item Constant into 20 sections.
 The item Variable spans the entirety of the screen because we its widthDimension a value of .fractionalWidth(1.0) and its heightDimension a value of .fractionalWidth(1.0), that is why the item spans the entire screen.
 
-We then assign our NSDirectionalEdgeInsets to our item Constant, this takes
+We then assign our NSDirectionalEdgeInsets to our item Constant, its initializer takes a top, leading, bottom, and trailing argument.
+
+In our case, we want to push the sections 10 points away from its trailing edge and 10 points away from its bottom edge.
+
+
+
+TableView ) Our simulator is showing a list of cells, compositional layouts allow us to mold our cells in various ways which is why our simulator seems to be displaying a TableView when it is displaying a collectionView.
+
+
+
+SectionType ) Our compositional layout design allows us to specify a different section layout based on the index, which is to say that one section in our collectionView can be molded into a group of squares while the subsequent section is a rectangle.
+
+In our case, we want to have three different sections of data, but using integers to identify the sections is untidy, so we will create some objects that will help us represent the different types of sections.
+
+Head over to the RMCharacterDetailViewViewModel file.
+
+
+
+configure ) Returning from RMCharacterDetailViewViewModel, we are going to create an instance of RMCharacterDetailViewViewModel within our RMCharacterDetailView.
+
+To do so, at the bottom of our Class, we are going to implement a configure() Function.
+The configure() Function will take a viewModel of Type RMCharacterDetailViewViewModel as input, then it will assign it to RMCharacterDetailView's viewModel Variable.
+
+
+
+viewModel ) Notice that our viewModel's Type is Optional, that's because we will give it a value inside of the configure() Function.
+
+
+
+Redesign ) Our initializer creates the collectionView when the RMCharacterDetailView Class comes into existence.
+Our configure() Function expects a viewModel to be passed in after the Class is initialized.
+
+Therefore, our current design would cause a crash :
+
+    private var viewModel: RMCharacterDetailViewViewModel?
+    ...
+    public func configure(with viewModel: RMCharacterDetailViewViewModel) {
+        self.viewModel = viewModel
+    }
+
+In place of our configure() Function, we are going to add another parameter to our Class's initializer :
+
+    private var viewModel: RMCharacterDetailViewViewModel
+
+    init(frame: CGRect, viewModel: RMCharacterDetailViewViewModel) {
+        self.viewModel = viewModel
+        ...
+    }
+
+Notice that the viewModel's Type is no longer Optional.
+
+Then, in our RMCharacterDetailViewController, we are going to create our RMCharacterListView with the appropriate ViewModel.
+Head over to RMCharacterDetailViewController.
+
+
+
+sectionTypes ) Once our viewModel is created in the RMCharacterDetailViewController and passed into an instance of RMCharacterDetailView, we are going to assign RMCharacterDetailViewViewModel's sections Constant to our createSection() Function's sectionTypes Constant.
+
+Our sectionTypes Constant allows us to switch on the cases that we laid out in the SectionType Enum.
+We will use the switch functionality to pick out the correction Function to call.
+
+With this design, our createSection() Function is expecting an NSCollectionLayoutSection to be returned, which is exactly what the Layout Functions return.
+
+
+
+createPhotoSectionLayout ) To keep our code organized, we are going to move our NSCollectionLayoutSection code into a Function called createPhotoSectionLayout.
+
+We will then copy and paste that code two more times in order to have a layout for each case in our SectionType Enum.
 
 */

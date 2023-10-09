@@ -11,6 +11,16 @@ final class RMCharacterDetailViewViewModel {
     
     private let character: RMCharacter
     
+    enum SectionType: CaseIterable {
+        case photo
+        case information
+        case episodes
+    }
+    
+    public let sections = SectionType.allCases
+    
+    // MARK: - Initializer
+    
     init(character: RMCharacter) {
         self.character = character
     }
@@ -68,5 +78,19 @@ There was no point in building out the fetchCharacterData() Function because our
     }
 
 This Function is not returning a trimmed down version of model, instead it is returning the entire Character model.
+
+*/
+
+
+/*
+
+
+-> Compositional Layout Section
+
+
+SectionType ) Our RMCharacterDetailView's compositional layout is going to adapt to the case that we chose from our SectionType Enum.
+
+In order to incorporate SectionType's cases into our RMCharacterDetailView, we will have our Enum adopt CaseIterable.
+Then, we are going to make a public sections Constant, which we will use in our RMCharacterDetailView Class.
 
 */

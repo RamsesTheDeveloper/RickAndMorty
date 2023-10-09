@@ -12,12 +12,13 @@ final class RMCharacterDetailViewController: UIViewController {
     
     private let viewModel: RMCharacterDetailViewViewModel
     
-    private let detailView = RMCharacterDetailView()
+    private let detailView: RMCharacterDetailView
     
     // MARK: - Initializer
     
     init(viewModel: RMCharacterDetailViewViewModel) {
         self.viewModel = viewModel
+        self.detailView = RMCharacterDetailView(frame: .zero, viewModel: viewModel)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -58,13 +59,26 @@ final class RMCharacterDetailViewController: UIViewController {
 // MARK: - CollectionView
 
 extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return viewModel.sections.count
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        20
+        10
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .systemYellow
+        
+        if indexPath.section == 0 {
+            cell.backgroundColor = .systemPink
+        } else if indexPath.section == 1 {
+            cell.backgroundColor = .systemGreen
+        } else {
+            cell.backgroundColor = .systemBlue
+        }
+        
         return cell
     }
 }
@@ -180,5 +194,45 @@ Head over to the RMCharacterDetailView file.
 Returning from the RMCharacterDetailView file, within the viewDidLoad() Function, we are going to set our collectionView's .delegate property equal to self (RMCharacterDetailViewController Class) and we will do the same for the .dataSource.
 
 
+
+NSDirectionalEdgeInsets ) When we run our simulator, a pink block is diplayed on screen.
+Our 20 cells are present in that block, but we must provide a value to the .contentInsets Variable, within RMCharacterDetailView's createSection() Function, in order to see our sections on the screen.
+
+
+
+Initializer ) Since our RMCharacterDetailView requires a viewModel, we can no longer instantiated at the top of our Class like so :
+
+    private let detailView = RMCharacterDetailView()
+
+Instead, we won't instantiate it and we will create an instance of RMCharacterDetailView within RMCharacterDetailViewController's initializer after the RMCharacterDetailViewViewModel is created.
+
+The reason this works is because our Controller is required to create a viewModel and our RMCharacterDetailView needs a viewModel in order to be instantiated, therefore this approach kills two birds with one stone.
+
+Returning to RMCharacterListView, we are going to use the viewModel we are passing in here, in the createSection() Function.
+
+
+
+numberOfSections ) The numberOfSections() Function is going to return our viewModel's .sections.count.
+We will also change the number of cells being returned in the numberOfItemsInSection() Function from 20 to 10.
+
+We are doing this because we want to have some gummy data to work with.
+
+
+
+cellForItemAt ) In order to develop the cases of our SectionType, we are going to create an If Statement that will change the color of the cells in our RMCharacterDetailView based on the case :
+
+    let cell = collectionView.dequequeReusableCell(withReuseIdentifier: "cell", for: indexPath)
+
+    if indexPath.section == 0 {
+        cell.backgroundColor = .systemPink
+    } else if indexPath.section == 1 {
+        cell.backgroundColor = .systemGreen
+    } else {
+        cell.backgroundColor = .systemBlue
+    }
+    
+    return cell
+
+For now, the simulator is showing all of the colors on the screen, but our goal is to change what is being shown based on the SectionType case.
 
 */
