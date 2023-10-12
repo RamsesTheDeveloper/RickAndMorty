@@ -63,7 +63,22 @@ final class RMCharacterDetailView: UIView {
             return self.createSection(for: sectionIndex)
         }
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        
+        collectionView.register(
+            RMCharacterPhotoCollectionViewCell.self, 
+            forCellWithReuseIdentifier: RMCharacterPhotoCollectionViewCell.cellIdentifier
+        )
+        
+        collectionView.register(
+            RMCharacterInfoCollectionViewCell.self,
+            forCellWithReuseIdentifier: RMCharacterInfoCollectionViewCell.cellIdentifier
+        )
+        
+        collectionView.register(
+            RMCharacterEpisodeCollectionViewCell.self,
+            forCellWithReuseIdentifier: RMCharacterEpisodeCollectionViewCell.cellIdentifier
+        )
+        
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }
@@ -321,5 +336,51 @@ Abstraction ) We are going to cut and paste our createPhotoSectionLayout(), crea
 Doing so causes and error, so within the createSection() Function, we are going to prefix the calls to our layout Functions with our viewModel Constant.
 
 Head over to the RMCharacterDetailViewViewModel file.
+
+*/
+
+
+/*
+
+
+-> Character Detail ViewModels Section
+
+
+UICollectionViewCell ) Our SectionType Enum represents the 3 sections we are showing in our collectionView.
+Respectively, we will want three different kinds of cells to fulfill our three different sections.
+
+We will need an image cell, Character info cell, and a Character Episode cell.
+For each of those cells we will want a ViewModel, but we will first need a View for that data.
+
+To begin, we will create a Character Group and we will move our RMCharacterListView and RMCharacterCollectionViewCell into that Group.
+
+Within the Views Group we are going to CharacterDetails Group and we will drop our RMCharacterDetailView in that Group.
+We will also create three UICollectionViewCell Cocoa Touch Classes called RMCharacterPhotoCollectionViewCell, RMCharacterInfoCollectionViewCell, and RMCharacterEpisodeCollectionViewCell within the CharacterDetails Group.
+
+
+
+ViewModels ) We will need to register these UICollectionViewCell's within RMCharacterDetailView's createCollectionView() Function, but before we do, we will need to make ViewModels for the RMCharacterPhotoCollectionViewCell, RMCharacterInfoCollectionViewCell, and RMCharacterEpisodeCollectionViewCell Classes.
+
+Within the ViewModels Group, we are going to create a CharacterDetails Group and within that Group we are going to create three Swift files called RMCharacterPhotoCollectionViewCellViewModel, RMCharacterInfoCollectionViewCellViewModel, and RMCharacterEpisodeCollectionViewCellViewModel.
+
+Within each of these files, we will create a data structure that matches the data we are receiving.
+Go into each of the files in the ViewModels CharacterDetails Group and declare a final Class with an empty initializer.
+
+
+
+Associated ) We will need to store the CharacterDetails ViewModels within our RMCharacterDetailViewViewModel, to do so, we are going to use associated values with our SectionType's Enum cases.
+
+Head over to the RMCharacterDetailViewViewModel file.
+
+
+
+createCollectionView ) Within the createCollectionView() Function, we are going to register our UICollectionViewCell's with the cellIdentifier that we created within our CharacterDetails Classes.
+
+In this case we will need to call .register() a total of three times because we have three UICollectionViewCells.
+
+If we run our application right now, it will crash.
+The reason that it will crash is because our RMCharacterDetailViewController's cellForItemAt() Function is dequeuing a cell with our default cellIdentifier.
+
+Head over to RMCharacterDetailViewController.
 
 */

@@ -11,18 +11,39 @@ final class RMCharacterDetailViewViewModel {
     
     private let character: RMCharacter
     
-    enum SectionType: CaseIterable {
-        case photo
-        case information
-        case episodes
+    enum SectionType {
+        case photo(viewModel: RMCharacterPhotoCollectionViewCellViewModel)
+        
+        case information(viewModels: [RMCharacterInfoCollectionViewCellViewModel])
+        
+        case episodes(viewModels: [RMCharacterEpisodeCollectionViewCellViewModel])
     }
     
-    public let sections = SectionType.allCases
+    public var sections: [SectionType] = []
     
     // MARK: - Initializer
     
     init(character: RMCharacter) {
         self.character = character
+        setUpSections()
+    }
+    
+    private func setUpSections() {
+        sections = [
+            .photo(viewModel: .init()),
+            .information(viewModels: [
+                .init(),
+                .init(),
+                .init(),
+                .init()
+            ]),
+            .episodes(viewModels: [
+                .init(),
+                .init(),
+                .init(),
+                .init()
+            ])
+        ]
     }
     
     private var requestUrl: URL? {
@@ -177,5 +198,43 @@ Then, we are going to make a public sections Constant, which we will use in our 
 public ) Abstracting our layout Functions requires that this file import UIKit, so at the top we will import UIKit.
 We also need to make the Functions public instead of private because they are being called within the RMCharacterDetailView.
 
+
+*/
+
+
+/*
+
+
+-> Character Detail ViewModels Section
+
+
+Associated ) We are going to use associated values with our Enum cases.
+The goal of using associated values is to bring in the UICollectionViewCell's we created in the CharacterDetails Group into our collectionView, but to do so we also need to take into account the ViewModels that we created in the CharacterDetails Group, which resides within the ViewModels Group.
+
+Each of our cases is going to have an associated value of one or more ViewModels.
+
+The photo case has only one ViewModel because we will only display one image on the screen.
+The information and episodes cases will be an Array of ViewModels because there will be more than one cell in that SectionType section.
+
+
+
+sections ) We can no longer conform to CaseIterable if our cases have associated values.
+Since our Enum no longer conforms to CaseIterable, we can no longer access .allCases.
+
+So, we will need to create sub associated values in order to create our Colletion of sections manually.
+To do so, we are going to change our sections Constant to a sections Variable and we will give it a Type of SectionType Array which will have an initial value of empty Array.
+
+
+
+setUpSections ) Our setUpSections() Function will set the value of our sections Variable by accessing the SectionType cases, it can access the SectionType cases because it is of Type SectionTypeArray.
+
+For each case we will call that ViewModels initializer.
+
+We will then call the setUpSections() Function in the initializer.
+
+Once we've made these changes, we need to go into our DataSource and make changes to our numberOfItemsInSection() Function because we hard coded how many items we put in each section.
+
+The DataSource is located in the RMCharacterDetailViewController.
+Head over to the RMCharacterDetailViewController file.
 
 */

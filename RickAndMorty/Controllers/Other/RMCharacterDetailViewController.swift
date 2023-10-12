@@ -65,30 +65,64 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        switch section {
-        case 0:
+        
+        let sectionType = viewModel.sections[section]
+        
+        switch sectionType {
+        case .photo:
             return 1
-        case 1:
-            return 8
-        case 2: 
-            return 20
-        default:
-            return 1
+        case .information(viewModels: let viewModels):
+            return viewModels.count
+        case . episodes(viewModels: let viewModels):
+            return viewModels.count
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
         
-        if indexPath.section == 0 {
-            cell.backgroundColor = .systemPink
-        } else if indexPath.section == 1 {
-            cell.backgroundColor = .systemGreen
-        } else {
-            cell.backgroundColor = .systemBlue
+        let sectionType = viewModel.sections[indexPath.section]
+        
+        switch sectionType {
+        case .photo(let viewModel):
+            
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RMCharacterPhotoCollectionViewCell.cellIdentifier,
+                for: indexPath
+            ) as? RMCharacterPhotoCollectionViewCell else {
+                fatalError()
+            }
+            
+            cell.configure(with: viewModel)
+            cell.backgroundColor = .systemYellow
+            return cell
+            
+        case .information(viewModels: let viewModels):
+            
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RMCharacterInfoCollectionViewCell.cellIdentifier,
+                for: indexPath
+            ) as? RMCharacterInfoCollectionViewCell else {
+                fatalError()
+            }
+            
+            cell.configure(with: viewModels[indexPath.row])
+            cell.backgroundColor = .systemRed
+            return cell
+            
+        case .episodes(viewModels: let viewModels):
+            
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RMCharacterEpisodeCollectionViewCell.cellIdentifier,
+                for: indexPath
+            ) as? RMCharacterEpisodeCollectionViewCell else {
+                fatalError()
+            }
+            
+            cell.configure(with: viewModels[indexPath.row])
+            cell.backgroundColor = .systemOrange
+            return cell
+            
         }
-        
-        return cell
     }
 }
 
@@ -266,5 +300,82 @@ We will also need to set a default case within the Switch Statement.
 Note that for each section we are returning the number of cells that will be displayed in our collectionView.
 
 Head over to RMCharacterDetailView.
+
+*/
+
+
+/*
+
+
+-> Character Detail ViewModels Section
+
+
+numberOfItemsInSection ) Within our RMCharacterDetailViewViewModel we gave associated values to our SectionType's cases.
+By doing so, we could no longer use .allCases because our SectionType Enum no longer conformed to the CaseIterable Protocol.
+
+So, we had to create a setUpSections() Function, which leads us to the RMCharacterDetailViewController.
+Our Controller is the Delegate and DataSource of RMCharacterDetailViewViewModel.
+
+By assigning associated values to our SectionType Enum, we no longer have a simple 1, 2, 3 count.
+Therefore, our numberOfItemsInSection() Function needs to reflect those changes.
+
+
+
+sectionType ) At the top of the Function we are going to declare a Constant called sectionType, the purpose of this Constant is to identify the SectionType case that we are working with.
+
+The sectionType Constant will have a value of viewModel.sections[section].
+Notice that we are passing in the section that we are receiving as an argument into .sections.
+section is the index of the sections Array in RMCharacterDetailViewViewModel.
+
+We will then switch on sectionType, instead of switching on a random integer.
+For the .photo case, we know that we will only return one ViewModel because we will display a single image.
+The .information and .episodes cases are different because they are Arrays, so we will return that viewModels' .count.
+
+Run the simulator, we should see 1 pink square, four green squares, and four blue squares because that is how many we initialized in RMCharacterDetailViewViewModel's setUpSections() Function.
+
+
+
+cellIdentifier ) Go into each UICollectionViewCell Class within the CharacterDetails Group and create a cellIdentifier and finalize the Class.
+
+The CharacterDetails Group is found within the Views Group.
+
+We can use anything for the cellIdentifier, but the instructor prefers to use the name of the Class for which it is an identifier.
+Doing so, is helpful for debugging in the case of the application crashing.
+
+Once we have our cellIdentifier, we will head over to RMCharacterDetailView and register our cells.
+Head over to RMCharacterDetailView.
+
+
+
+cellForItemAt ) Once we've registered our cells, we need to dequeue them in the cellForItemAt() Function.
+Our design requires that we dequeue a cell based on its case, meaning that we want to dynamically dequeue a cell based on the Type of data that we have.
+
+With that said, we will need to get the current section for which we are trying to dequeue, which we already did in the numberOfItemsInSection() Function, so we are going to copy and paste it into the cellForItemAt() Function and replace .sections[section] with .sections[indexPath.section]
+
+Each case in the Switch Statement will require that we dequeue the appropriate cell and cast it to that Type, that Type being the UICollectionViewCell for that section.
+
+We will also remove our If Statement :
+
+    if indexPath.section == 0 {
+        cell.backgroundColor = .systemPink
+    } else if indexPath.section == 1 {
+        cell.backgroundColor = .systemGreen
+    } else {
+        cell.backgroundColor = .systemBlue
+    }
+
+    return cell
+
+And in its place we will set the color of the cell within our switch statement.
+The color is set before the return cell statement at the end of each case.
+
+Head over to RMCharacterPhotoCollectionViewCell.
+
+
+
+configure ) Returning from our RMCharacterPhotoCollectionViewCell, we can now pass in the viewModel(s) that we are receiving from our Switch Statement, into that UICollectionViewCell's .configure(with:) Function.
+
+For the viewModels, we will need to access the indexPath's row.
+
 
 */
