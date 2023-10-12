@@ -65,7 +65,16 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        10
+        switch section {
+        case 0:
+            return 1
+        case 1:
+            return 8
+        case 2: 
+            return 20
+        default:
+            return 1
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -234,5 +243,28 @@ cellForItemAt ) In order to develop the cases of our SectionType, we are going t
     return cell
 
 For now, the simulator is showing all of the colors on the screen, but our goal is to change what is being shown based on the SectionType case.
+
+*/
+
+
+/*
+
+
+-> Create CollectionView Layouts Section
+
+
+numberOfItemsInSection ) We will start by building out the unique layouts for each of our SectionType cases.
+At the moment, our layout Functions reside in RMCharacterDetailView, but once we build them out, we will abstract them to our ViewModel.
+
+For the first section, we only need one cell, so we are going to hard code it so that we can see it for now.
+Later on, the cell being displayed will be determined by our ViewModels.
+
+Within the numberOfItemsInSection() Function, we are going to switch on the section argument.
+We will return different numbers of cells based on the section.
+
+We will also need to set a default case within the Switch Statement.
+Note that for each section we are returning the number of cells that will be displayed in our collectionView.
+
+Head over to RMCharacterDetailView.
 
 */

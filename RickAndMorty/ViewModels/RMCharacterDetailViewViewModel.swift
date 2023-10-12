@@ -5,7 +5,7 @@
 //  Created by Ramsés Abdala on 10/2/23.
 //
 
-import Foundation
+import UIKit
 
 final class RMCharacterDetailViewViewModel {
     
@@ -31,6 +31,78 @@ final class RMCharacterDetailViewViewModel {
     
     public var title: String {
         character.name.uppercased()
+    }
+    
+    // MARK: - Layouts
+    
+    public func createPhotoSectionLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0)
+        
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(0.5)
+            ),
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        return section
+    }
+    
+    public func createInfoSectionLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(0.5),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
+        
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .absolute(150)
+            ),
+            subitems: [item, item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        return section
+    }
+    
+    public func createEpisodeSectionLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0)
+            )
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 5, bottom: 10, trailing: 8)
+        
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(0.8),
+                heightDimension: .absolute(150)
+            ),
+            subitems: [item]
+        )
+        
+        let section = NSCollectionLayoutSection(group: group)
+        section.orthogonalScrollingBehavior = .groupPaging
+        
+        return section
     }
 }
 
@@ -92,5 +164,18 @@ SectionType ) Our RMCharacterDetailView's compositional layout is going to adapt
 
 In order to incorporate SectionType's cases into our RMCharacterDetailView, we will have our Enum adopt CaseIterable.
 Then, we are going to make a public sections Constant, which we will use in our RMCharacterDetailView Class.
+
+*/
+
+
+/*
+
+
+-> Create CollectionView Layouts Section
+
+
+public ) Abstracting our layout Functions requires that this file import UIKit, so at the top we will import UIKit.
+We also need to make the Functions public instead of private because they are being called within the RMCharacterDetailView.
+
 
 */

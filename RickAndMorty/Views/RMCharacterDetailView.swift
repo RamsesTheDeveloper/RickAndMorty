@@ -74,81 +74,12 @@ final class RMCharacterDetailView: UIView {
         
         switch sectionTypes[sectionIndex] {
         case .photo:
-            return createPhotoSectionLayout()
+            return viewModel.createPhotoSectionLayout()
         case .information:
-            return createInfoSectionLayout()
+            return viewModel.createInfoSectionLayout()
         case .episodes:
-            return createEpisodeSectionLayout()
+            return viewModel.createEpisodeSectionLayout()
         }
-    }
-    
-    private func createPhotoSectionLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-        )
-        
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10)
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(150)
-            ),
-            subitems: [item]
-        )
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        return section
-    }
-    
-    private func createInfoSectionLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-        )
-        
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10)
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(150)
-            ),
-            subitems: [item]
-        )
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        return section
-    }
-    
-    private func createEpisodeSectionLayout() -> NSCollectionLayoutSection {
-        let item = NSCollectionLayoutItem(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .fractionalHeight(1.0)
-            )
-        )
-        
-        item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 10)
-        
-        let group = NSCollectionLayoutGroup.vertical(
-            layoutSize: NSCollectionLayoutSize(
-                widthDimension: .fractionalWidth(1.0),
-                heightDimension: .absolute(150)
-            ),
-            subitems: [item]
-        )
-        
-        let section = NSCollectionLayoutSection(group: group)
-        
-        return section
     }
 }
 
@@ -257,7 +188,7 @@ Returning from the RMCharacterDetailViewController file, we are going to expose 
     ( 1 ) We are going to expose our collectionView Variable by making its declaration public instead of private.
     Once we've made our collectionView Variable public, we are going to head over to the RMCharacterDetailViewController.
     
-    ( 2 )
+    ( 2 ) The instructor didn't walk us through the second property.
 
 
 
@@ -334,5 +265,61 @@ With this design, our createSection() Function is expecting an NSCollectionLayou
 createPhotoSectionLayout ) To keep our code organized, we are going to move our NSCollectionLayoutSection code into a Function called createPhotoSectionLayout.
 
 We will then copy and paste that code two more times in order to have a layout for each case in our SectionType Enum.
+
+*/
+
+
+/*
+
+
+-> Create CollectionView Layouts Section
+
+
+createPhotoSectionLayout ) We want to display a large cell for the first section, so within the createPhotoSectionLayout() Function, we are going to change the value of our group's heightDimension to .fractionalHeight(0.5).
+
+Each SectionType has a container, that container holds the layout for that SectionType case.
+The container has a height and width, so when we set a value of .fractionalHeight(0.5) for our group's heightDimension, then the layout for that section will be half of the screen.
+
+Half of the screen does not mean half of the collectionView, it means half of the device's screen, which is represented by that section's container.
+
+We also changed the item's trailing value from 10 to 0.
+
+
+
+createInfoSectionLayout ) We want our second section to have a grid with two columns, each cell in that column will be a piece of information about that Character.
+
+To begin, we are going to set the item's widthDimension equal to .fractionalWidth(0.5)
+
+Next, we are going to add spacing to each item by setting the item's leading value equal to 2.
+Likewise, we will set trailing to 2.
+
+We also want to set the item's bottom and top value to 2 as well.
+
+In this case, we are going to change the Function we are invoking on the NSCollectionLayoutGroup object from .vertical to .horizontal.
+
+For the subitems argument, we will enter two items into the Array.
+
+
+
+createEpisodeSectionLayout ) We don't want the Episode section to be an unlimited ScrollView, so we are going to call .horizontal() on the group's NSCollectionLayoutGroup, then we are going to set the widthDimension equal to .fractionalWidth(0.8).
+
+Setting the widthDimension to .fractionalWidth(0.8) makes it so that when the user srolls right or left, they snap to the next card.
+
+Before we return the section, we are going to call .orthogonalScrollingBehavior and we are going to set it to .groupPaging because we will load more episodes for that Character as the user scrolls.
+
+We are going to keep the default widthDimension and heightDimension of our item.
+We will set a value of 10 for the item's top and bottom.
+We will also set a value of 5 for the leading and a value of 8 for the trailing.
+
+This configuration makes our cells 1/3 the width of the entire screen, that way we can fit three cells on the screen instead of 1.
+Moreover, we can continuously scroll horizontally.
+
+
+
+Abstraction ) We are going to cut and paste our createPhotoSectionLayout(), createInfoSectionLayout(), and createEpisodeSectionLayout() Functions into our RMCharacterDetailViewViewModel.
+
+Doing so causes and error, so within the createSection() Function, we are going to prefix the calls to our layout Functions with our viewModel Constant.
+
+Head over to the RMCharacterDetailViewViewModel file.
 
 */
