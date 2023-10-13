@@ -14,6 +14,7 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Earth"
+        label.font = .systemFont(ofSize: 22, weight: .light)
         return label
     }()
     
@@ -59,23 +60,31 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
     
     private func setUpConstraints() {
         NSLayoutConstraint.activate([
+            
+            titleContainerView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.33),
             titleContainerView.leftAnchor.constraint(equalTo: contentView.leftAnchor),
             titleContainerView.rightAnchor.constraint(equalTo: contentView.rightAnchor),
             titleContainerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-            titleContainerView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.33),
             
+            titleLabel.topAnchor.constraint(equalTo: titleContainerView.topAnchor),
             titleLabel.leftAnchor.constraint(equalTo: titleContainerView.leftAnchor),
             titleLabel.rightAnchor.constraint(equalTo: titleContainerView.rightAnchor),
             titleLabel.bottomAnchor.constraint(equalTo: titleContainerView.bottomAnchor),
-            titleLabel.topAnchor.constraint(equalTo: titleContainerView.topAnchor),
             
             iconImageView.heightAnchor.constraint(equalToConstant: 30),
             iconImageView.widthAnchor.constraint(equalToConstant: 30),
-            iconImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
-            iconImageView.bottomAnchor.constraint(equalTo: titleContainerView.topAnchor, constant: -10),
+            
             iconImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 35),
+            iconImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
+            // iconImageView.bottomAnchor.constraint(equalTo: titleContainerView.topAnchor, constant: -10),
+            
+            valueLabel.heightAnchor.constraint(equalToConstant: 30),
+            
+            valueLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 36),
+            valueLabel.leftAnchor.constraint(equalTo: iconImageView.rightAnchor, constant: 10),
+            valueLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
         ])
-        
+        // valueLabel.backgroundColor = .blue
     }
     
     override func prepareForReuse() {
@@ -113,8 +122,26 @@ We also want to push off the titleContainerView because if we don't then our ico
 We want to clip the edges of the cell because the bottom is not pointy, but the top of the cell is rounded.
 
 The iconImageView is distorted, so we are going to set its .contentMode equal to .scaleAspectFit.
-We will also the contentView.layer's .masksToBounds equal to true, so that everything stays inside of the rounded corners.
-Start at 5:30:00.
+ 
+Within the Class's initializer, we will set the contentView.layer's .masksToBounds equal to true, so that everything stays inside of the rounded corners.
+
+When we set a .heightAnchor, there is no need to set a .bottomAnchor.
+
+
+
+valueLabel ) Setting the valueLabel's constraints as :
+
+    valueLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 35),
+    valueLabel.leftAnchor.constraint(equalTo: iconImageView.rightAnchor, constant: 10),
+    valueLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
+    valueLabel.bottomAnchor.constraint(equalTo: titleContainerView.topAnchor, constant: -10),
+
+Stretches the valueLabel vertically across the RMCharacterInfoCollectionViewCell while at the same time the text is vertically centered which makes the valueLabel look out of place.
+
+So, instead of having a .bottomAnchor, we are going to give it a fixed height, and by doing so, we don't have to specify the bottom anchor because we know where the end of the label is going to be.
+
+We will also set a font for the valueLabel within its Anonymous Function.
+Be mindful of line wrapping.
 
 
 */
