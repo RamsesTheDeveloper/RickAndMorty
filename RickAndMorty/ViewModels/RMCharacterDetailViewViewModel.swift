@@ -11,6 +11,10 @@ final class RMCharacterDetailViewViewModel {
     
     private let character: RMCharacter
     
+    public var episodes: [String] {
+        character.episode
+    }
+    
     enum SectionType {
         case photo(viewModel: RMCharacterPhotoCollectionViewCellViewModel)
         
@@ -293,6 +297,20 @@ We will replace :
 The change we need to make is deleting the title and placing the type in front of the value.
 
 Head over to the RMCharacterInfoCollectionViewCellViewModel file.
+
+
+*/
+
+
+/*
+
+
+-> Character Episode Cell Section
+
+
+episodes ) We need to expose our the Character's episodes so that RMCharacterDetailViewController's didSelectItemAt() Function can push to a new screen.
+
+Head over to RMCharacterDetailViewController.
 
 
 */

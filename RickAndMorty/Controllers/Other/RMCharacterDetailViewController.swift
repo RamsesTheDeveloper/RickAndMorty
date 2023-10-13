@@ -127,6 +127,20 @@ extension RMCharacterDetailViewController: UICollectionViewDelegate, UICollectio
             
         }
     }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let sectionType = viewModel.sections[indexPath.section]
+        switch sectionType {
+        case.photo, .information:
+            break
+        case .episodes:
+            let episodes = self.viewModel.episodes
+            let selection = episodes[indexPath.row]
+            
+            let vc = RMEpisodeDetailViewController(url: URL(string: selection))
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
 }
 
 /*
@@ -379,6 +393,45 @@ Head over to RMCharacterPhotoCollectionViewCell.
 configure ) Returning from our RMCharacterPhotoCollectionViewCell, we can now pass in the viewModel(s) that we are receiving from our Switch Statement, into that UICollectionViewCell's .configure(with:) Function.
 
 For the viewModels, we will need to access the indexPath's row.
+
+
+*/
+
+
+/*
+
+
+-> Character Episode Cell Section
+
+
+didSelectItemAt ) In our RMCharacterDetailViewController extension, we want to implement the didSelectItemAt() Function.
+We are going to copy the switch in cellForItemAt and paste it in the didSelectItemAt() Function.
+
+In this case, we are going to break if the case is .photo or .information.
+Otherwise we are going to get the episode's ViewModel and then we will push a new screen that will render an episode.
+
+The RMCharacterEpisodeCollectionViewCellViewModel is already giving us pieces of information from RMEpisode, but it is likely that we don't want to pass in that ViewModel into our didSelectItemAt() Function.
+
+So, we are going to take the URLs for those episodes from the ViewModel that we passed into our RMCharacterDetailViewController's initializer, which in this case is RMCharacterDetailViewViewModel.
+
+We are choosing RMCharacterDetailViewViewModel because the didSelectItemAt() Function is provides an indexPath as a parameter.
+Therefore, we already know at which indexPath row we want to get the information, so we can just access the url directly.
+
+Before we do that, we are going to expose RMCharacterDetailViewViewModel's episodes.
+Head over to RMCharacterDetailViewViewModel.
+
+Once we've exposed the episodes, we can now pick out the model in our Array via indexPath.row.
+
+The goal of doing all of this is to pass our model into another Controller.
+
+
+
+RMEpisodeDetailViewController ) Within the Other Group, we are going to create a Cocoa Touch Class called RMEpisodeDetailViewController of Type UIViewController.
+
+Head over to the RMEpisodeDetailViewController file.
+
+Once our RMEpisodeDetailViewController is created, we are going to push to it from the didSelectItemAt() Function.
+When we ran our application in the simulator and we clicked on the episode cell, there was a lag, the lage occurred because RMEpisodeDetailViewController did not have a backgroundColor, so that lag is fixed by giving RMEpisodeDetailViewController a backgroundColor.
 
 
 */
