@@ -131,4 +131,11 @@ We use negative constants because we are moving from right to left.
 
 Head over to RMCharacterDetailViewController.
 
+
+
+Recap ) After the RMEpisodeDetailViewController was created, the instructor provided a recap.
+We used RMCharacterDetailViewController's didSelectItemAt() Function to get the section of the selected ViewModel (the cell that the user is tapping on), then from the position in that section, we get the episode by exposing the episodes Collection for the RMCharacterDetailView instance in RMCharacterDetailViewController which was done in RMCharacterDetailViewViewModel, and then we created an instance RMEpisodeDetailViewController and passed in the URL.
+
+
+
 */

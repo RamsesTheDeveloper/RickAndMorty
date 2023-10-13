@@ -12,6 +12,8 @@ final class RMService {
     /// Shared singleton instance
     static let shared = RMService()
     
+    private let cacheManager = RMAPICacheManager()
+    
     /// Privatize Constructor
     private init() {}
     
@@ -144,5 +146,18 @@ To recap, it is up to the caller, which we've used RMCharacterViewController as 
 The expecting Type is the Type that the caller expects to get back.
 Then, within our do statement we are again using the type that was passed into our execute() Function.
 Notice that type.self is referring to type, which was declared in our Function Signature.
+
+*/
+
+
+/*
+
+
+-> API Cache Layer Section
+
+
+cacheManager ) At the top of our Class we are going to create an instance of RMAPICacheManager and save to the cacheManager Constant.
+
+
 
 */
