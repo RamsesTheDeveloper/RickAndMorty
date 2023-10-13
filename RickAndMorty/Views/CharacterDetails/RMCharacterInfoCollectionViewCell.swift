@@ -12,8 +12,10 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
     
     private let valueLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
+        // label.backgroundColor = .systemPink
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Earth"
+        // label.text = "Earth"
         label.font = .systemFont(ofSize: 22, weight: .light)
         return label
     }()
@@ -21,7 +23,7 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Location"
+        // label.text = "Location"
         label.textAlignment = .center
         label.font = .systemFont(ofSize: 20, weight: .medium)
         return label
@@ -30,7 +32,7 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
     private let iconImageView: UIImageView = {
         let icon = UIImageView()
         icon.translatesAutoresizingMaskIntoConstraints = false
-        icon.image = UIImage(systemName: "globe.americas")
+        // icon.image = UIImage(systemName: "globe.americas")
         icon.contentMode = .scaleAspectFit
         return icon
     }()
@@ -78,20 +80,35 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
             iconImageView.leftAnchor.constraint(equalTo: contentView.leftAnchor, constant: 20),
             // iconImageView.bottomAnchor.constraint(equalTo: titleContainerView.topAnchor, constant: -10),
             
-            valueLabel.heightAnchor.constraint(equalToConstant: 30),
+            // valueLabel.heightAnchor.constraint(equalToConstant: 30),
             
-            valueLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 36),
+            valueLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
             valueLabel.leftAnchor.constraint(equalTo: iconImageView.rightAnchor, constant: 10),
             valueLabel.rightAnchor.constraint(equalTo: contentView.rightAnchor, constant: -10),
+            valueLabel.bottomAnchor.constraint(equalTo: titleContainerView.topAnchor)
         ])
         // valueLabel.backgroundColor = .blue
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        valueLabel.text = nil
+        
+        titleLabel.text = nil
+        titleLabel.tintColor = .label // configure() applies a tintColor, so we will need to reset it as well.
+        
+        iconImageView.image = nil
+        iconImageView.tintColor = .label
     }
     
     public func configure(with viewModel: RMCharacterInfoCollectionViewCellViewModel) {
+        titleLabel.text = viewModel.title
+        titleLabel.tintColor = viewModel.tintColor
+        
+        valueLabel.text = viewModel.displayValue
+        
+        iconImageView.image = viewModel.iconImage
+        iconImageView.tintColor = viewModel.tintColor
         
     }
 }
@@ -99,7 +116,7 @@ final class RMCharacterInfoCollectionViewCell: UICollectionViewCell {
 /*
 
 
--> Character Info Cell Section We are going to build out the View as well as tweak the ViewModel in order to make it Type safe and useful.
+-> Character Info Cell Section
 
 
 titleContainerView ) Instead of adding our titleLabel directly to our RMCharacterInfoCollectionViewCell, we are going to add it to our titleContainerView, but the titleContainerView will be added to the RMCharacterInfoCollectionViewCell.
@@ -143,5 +160,34 @@ So, instead of having a .bottomAnchor, we are going to give it a fixed height, a
 We will also set a font for the valueLabel within its Anonymous Function.
 Be mindful of line wrapping.
 
+*/
+
+
+/*
+
+
+-> Character Info ViewModel Section
+
+
+ RMCharacterInfoCollectionViewCellViewModel ) We are going to build out the View as well as tweak the ViewModel in order to make it Type safe and useful.
+
+The process that we undertake when building a screen is creating the API request, receiving it, saving that data in the ViewModel and funneling that data into the View, which in this case is RMCharacterInfoCollectionViewCell.
+
+After assigning a value to titleLabel and valueLabel, the simulator is not displaying an image, some text is being cut off and truncated, and the date is not formatted.
+
+Moreover, in some cases we are not receiving any data, but we are still displaying a cell for that data.
+
+Head over to the RMCharacterInfoCollectionViewCellViewModel file.
+
+
+
+configure ) Coming from RMCharacterInfoCollectionViewCellViewModel, we will need to change the value that we are assigning to our valueLabel.text wtihin the configure() Function because we are now using displayValue, instead of just value.
+
+We will also assign a value to the iconImageView.
+
+
+
+valueLabel ) The date we are receiving is too long, so we are going to set valueLabel's .numberOfLines equal to 0.
+The date is truncating because the height of our valueLabel is not appropriately sized, so in our setUpConstraints() Function, we are going to remove the .topAnchor's marign, we are going to remove the .heightAnchor, and we are going to create a .bottomAnchor constraint.
 
 */
