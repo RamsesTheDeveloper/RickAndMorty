@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct RMEpisode: Codable {
+struct RMEpisode: Codable, RMEpisodeDataRender {
     let id: Int
     let name: String
     let air_date: String
@@ -24,5 +24,17 @@ struct RMEpisode: Codable {
 
 
 Schema ) The schema for RMCharacter can be found at https://rickandmortyapi.com/documentation/#episode-schema
+
+*/
+
+
+/*
+
+
+-> Episode Fetch Section
+
+
+RMEpisodeDataRender ) The RMEpisodeDataRender Protocol is declared in RMCharacterEpisodeCollectionViewCellViewModel.
+
 
 */
