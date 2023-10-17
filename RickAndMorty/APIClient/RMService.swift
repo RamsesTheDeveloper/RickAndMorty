@@ -26,12 +26,32 @@ final class RMService {
         _ request: RMRequest,
         expecting type: T.Type,
         completion: @escaping (Result<T, Error>) -> Void) {
+            
+            // MARK: - Retrieve Cache
+            
+            if let cachedData = cacheManager.cachedResponse(for: request.endpoint, url: request.url) {
+                
+                print("Using cached API Response")
+                
+                do {
+                    let result = try JSONDecoder().decode(type.self, from: cachedData)
+                    completion(.success(result))
+                } catch {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            // MARK: - Create URLRequest for dataTask
+            
             guard let urlRequest = self.request(from: request) else {
                 completion(.failure(RMServiceError.failedToCreateRequest))
                 return
             }
             
-            let task = URLSession.shared.dataTask(with: urlRequest) { data, _, error in
+            // MARK: - Set Cache
+            
+            let task = URLSession.shared.dataTask(with: urlRequest) { [weak self] data, _, error in
                 guard let data = data, error == nil else {
                     completion(.failure(error ?? RMServiceError.failedToGetData))
                     return
@@ -40,6 +60,7 @@ final class RMService {
                 // Decode response
                 do {
                     let result = try JSONDecoder().decode(type.self, from: data)
+                    self?.cacheManager.setCache(for: request.endpoint, url: request.url, data: data)
                     completion(.success(result))
                 }
                 catch {
@@ -159,5 +180,37 @@ Notice that type.self is referring to type, which was declared in our Function S
 cacheManager ) At the top of our Class we are going to create an instance of RMAPICacheManager and save to the cacheManager Constant.
 
 
+
+endpoint ) Returning from RMAPICacheManager, we can see that our execute() Function takes an RMRequest instance as an argument.
+The execute() Function creates a urlRequest from the RMRequest.
+
+RMRequest encapsulates an instance of an RMEndpoint through its endpoint property.
+As of now, RMRequest's endpoint property is private, but we need to be public, so open the RMRequest file and make the endpoint Constant public.
+
+
+
+cachedData ) Returning from RMRequest, we are going to declared a Constant called cachedData within the execute() Function.
+cachedData will receive its value by calling chacheManager's cachedResponse() Function.
+
+The cachedResponse() Function is going to return data if the endpoint and URL instance of the RMRequest object is found in the NSCache.
+
+In the case that we have data, we want to decode that data into the appropriate expected Type, which means that we don't need to make an API call.
+
+So, within the curly braces, we are going to call our completion handler with the data.
+
+Retrieving data from our cache decreases our network usage and bandwidth with the other benefit of making our application run faster because we don't need to rely on the internet to load data over and over again.
+
+Note that although we are fetching data from our NSCache, we are still simulating fetching data from a given URL because the execute() Function is being called.
+
+The only change we made is that if we have the data in our NSCache, then we are going to return out of the Function before making a call to the Rick and Morty API.
+
+
+
+dataTask ) Otherwise, we are going to go into the .dataTask() Function's curly braces and we are going to capture self in a weak capacity, then we are going to call the .setCache() Function on our cacheManager and pass in the data that we are receiving from the Rick and Morty API.
+
+
+
+To exemplify how our Cache functionality works, we are going to open the RMEpisodeDetailViewController file.
+Head over to the RMEpisodeDetailViewController file.
 
 */

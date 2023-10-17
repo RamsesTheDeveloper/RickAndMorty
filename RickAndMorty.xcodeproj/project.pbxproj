@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0C0B8F872ACCD2DD008E09A6 /* RMImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C0B8F862ACCD2DD008E09A6 /* RMImageLoader.swift */; };
+		0C13026E2ADF3C0E00BCCF01 /* RMEpisodeDetailViewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13026D2ADF3C0E00BCCF01 /* RMEpisodeDetailViewViewModel.swift */; };
+		0C1302702ADF3CDD00BCCF01 /* RMEpisodeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C13026F2ADF3CDD00BCCF01 /* RMEpisodeDetailView.swift */; };
 		0C1455EA2AD9F46100BEAD15 /* RMEpisodeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1455E92AD9F46100BEAD15 /* RMEpisodeDetailViewController.swift */; };
 		0C1455EC2AD9FF3800BEAD15 /* RMAPICacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C1455EB2AD9FF3800BEAD15 /* RMAPICacheManager.swift */; };
 		0C2E6FF62ACB478900A63E6E /* RMCharacterDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C2E6FF52ACB478900A63E6E /* RMCharacterDetailViewController.swift */; };
@@ -51,6 +53,8 @@
 
 /* Begin PBXFileReference section */
 		0C0B8F862ACCD2DD008E09A6 /* RMImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMImageLoader.swift; sourceTree = "<group>"; };
+		0C13026D2ADF3C0E00BCCF01 /* RMEpisodeDetailViewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMEpisodeDetailViewViewModel.swift; sourceTree = "<group>"; };
+		0C13026F2ADF3CDD00BCCF01 /* RMEpisodeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMEpisodeDetailView.swift; sourceTree = "<group>"; };
 		0C1455E92AD9F46100BEAD15 /* RMEpisodeDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMEpisodeDetailViewController.swift; sourceTree = "<group>"; };
 		0C1455EB2AD9FF3800BEAD15 /* RMAPICacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMAPICacheManager.swift; sourceTree = "<group>"; };
 		0C2E6FF52ACB478900A63E6E /* RMCharacterDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RMCharacterDetailViewController.swift; sourceTree = "<group>"; };
@@ -143,6 +147,7 @@
 				0C8079602AD8534D00AB18F1 /* RMCharacterPhotoCollectionViewCell.swift */,
 				0C8079622AD8536900AB18F1 /* RMCharacterInfoCollectionViewCell.swift */,
 				0C8079642AD8538000AB18F1 /* RMCharacterEpisodeCollectionViewCell.swift */,
+				0C13026F2ADF3CDD00BCCF01 /* RMEpisodeDetailView.swift */,
 			);
 			path = CharacterDetails;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				0C8079672AD8555300AB18F1 /* RMCharacterPhotoCollectionViewCellViewModel.swift */,
 				0C8079692AD8556B00AB18F1 /* RMCharacterInfoCollectionViewCellViewModel.swift */,
 				0C80796B2AD8557800AB18F1 /* RMCharacterEpisodeCollectionViewCellViewModel.swift */,
+				0C13026D2ADF3C0E00BCCF01 /* RMEpisodeDetailViewViewModel.swift */,
 			);
 			path = CharacterDetails;
 			sourceTree = "<group>";
@@ -381,6 +387,7 @@
 				0CE3A6322AC48401002C0D3C /* RMEpisode.swift in Sources */,
 				0C2F5C4D2AC5F94C00188285 /* RMCharacterListView.swift in Sources */,
 				0C1455EA2AD9F46100BEAD15 /* RMEpisodeDetailViewController.swift in Sources */,
+				0C1302702ADF3CDD00BCCF01 /* RMEpisodeDetailView.swift in Sources */,
 				0CE3A6472AC4BE10002C0D3C /* RMEndpoint.swift in Sources */,
 				0C2F5C532AC6299100188285 /* RMCharacterCollectionViewCellViewModel.swift in Sources */,
 				0CE3A6192AC476CC002C0D3C /* SceneDelegate.swift in Sources */,
@@ -388,6 +395,7 @@
 				0C8079652AD8538000AB18F1 /* RMCharacterEpisodeCollectionViewCell.swift in Sources */,
 				0CE3A63B2AC48586002C0D3C /* RMCharacterViewController.swift in Sources */,
 				0C1455EC2AD9FF3800BEAD15 /* RMAPICacheManager.swift in Sources */,
+				0C13026E2ADF3C0E00BCCF01 /* RMEpisodeDetailViewViewModel.swift in Sources */,
 				0C2E6FF82ACB4A4100A63E6E /* RMCharacterDetailView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

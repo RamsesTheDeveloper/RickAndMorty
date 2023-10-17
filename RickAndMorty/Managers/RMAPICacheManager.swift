@@ -10,6 +10,43 @@ import Foundation
 /// Manages in memory session scoped API caches
 final class RMAPICacheManager {
     
+    // API URL: Data
+    
+    private var cacheDictionary: [
+        RMEndpoint: NSCache<NSString, NSData>
+    ] = [:]
+    
+    init() {
+        setUpCache()
+    }
+    
+    // MARK: - Public
+    
+    public func cachedResponse(for endpoint: RMEndpoint, url: URL?) -> Data? {
+        guard let targetCache = cacheDictionary[endpoint], let url = url else {
+            return nil // returning nil because the return object is Data
+        }
+        
+        let key = url.absoluteString as NSString
+        return targetCache.object(forKey: key) as? Data
+    }
+    
+    public func setCache(for endpoint: RMEndpoint, url: URL?, data: Data) {
+        guard let targetCache = cacheDictionary[endpoint], let url = url else {
+            return
+        }
+        
+        let key = url.absoluteString as NSString
+        targetCache.setObject(data as NSData, forKey: key)
+    }
+    
+    // MARK: - Private
+    
+    private func setUpCache() {
+        RMEndpoint.allCases.forEach { endpoint in
+            cacheDictionary[endpoint] = NSCache<NSString, NSData>()
+        }
+    }
 }
 
 /*
@@ -50,10 +87,58 @@ If we have one single cache, then we will never understand what is being purged 
 
 
 
-cacheDictionary ) In our RMAPICacheManager's initializer, we want to loop over all of our endpoints and create a pointer from each endpoint to the NSCache instance.
+cacheDictionary ) In our RMAPICacheManager's initializer, we want to loop over all of our endpoints and create a pointer from each endpoint to an NSCache instance.
 
 So, at the top of the Class we are going to create an empty Dictionary called cacheDictionary of Type NSCache<NSString, NSData>().
-Although it is empty 6:39:00.
+Our Dictionary has a String key and an NSCache value.
 
+
+
+RMEndpoint ) We are going to instantiate our NSCaches based on our RMEndpoints.
+Instead of setting our cacheDictionary's key are String, we can have our RMEndpoint Enum inherit from Hashable.
+
+We also need the ability to loop over all of the cases of our RMEndpoint Enum, so we will make it adopt CaseIterable.
+Head over to RmEndpoint and have it adopt Hashable and CaseIterable.
+
+
+
+setUpCache ) Returning from RMEndpoint, we are going to set the value of our cacheDictionary by looping over all of the cases of RMEndpoint which will return an element that can go inside of our Dictionary.
+
+To make this process simple, we are going to create a Function called setUpCache(), which we will call inside of our constructor.
+
+Within our .forEach() Loop, we will Subscript values into our cacheDictionary, the endpoint of our Loop represents each case in our RMEndpoint Enum.
+
+We will set the value of the key as a brand new NSCache object.
+Therefore, for each case in the Enum, there is an NSCache object.
+
+
+
+cachedResponse ) We also want a public Function that we can use to check that something is available within the cache.
+To do that, we are going to declare a public Function called cachedResponse().
+
+Our cachedResponse() Function will take an endpoint of Type RMEndpoint and an instance of URL.
+Our Function will have an Optional return Type of Data.
+
+
+
+targetCache ) Our targetCache will be located by looking for the key that the caller of the cachedResponse() Function provided.
+Once we have the targetCache (the caches are broken up into Character, Episode, and Location, so we need to select the right one), we are going to get the right object by calling NSCache's .object(forKey:) Function and we are going to pass in our unwrapped URL instance.
+
+In this case, we need to cast our URL instance into an NSString, so that it pairs with NSCache.
+
+This works because NSCache's declaration has object(forKey:) and setObject(obj:forKey:) Functions, in our case we are going to call .object(forKey:).
+
+The object that the .object(forKey:) Function returns is NSData, so we need to cast it into Data.
+
+
+
+setCache ) We also need a Function that adds an object to our NSCache instance, and in this case we are going to call the .setObject(obj:forKey:) Function instead of .object(forKey:).
+
+The setCache() Function's signature will have a data object that the caller will need to pass in when it invokes the setCache() Function.
+
+
+
+RMService ) Once our public Functions have been created, we will use them in our RMService Class.
+Head over to the RMService file.
 
 */
