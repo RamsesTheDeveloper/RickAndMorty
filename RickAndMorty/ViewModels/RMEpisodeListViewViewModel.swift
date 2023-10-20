@@ -20,12 +20,27 @@ final class RMEpisodeListViewViewModel: NSObject {
     
     private var isLoadingMoreCharacters = false
     
+    private let borderColors: [UIColor] = [
+        .systemGreen,
+        .systemBlue,
+        .systemOrange,
+        .systemPink,
+        .systemPurple,
+        .systemRed,
+        .systemYellow,
+        .systemIndigo,
+        .systemMint
+    ]
+    
     private var episodes: [RMEpisode] = [] {
         didSet {
             // print("Creating ViewModels")
             for episode in episodes {
                 
-                let viewModel = RMCharacterEpisodeCollectionViewCellViewModel(episodeDataUrl: URL(string: episode.url))
+                let viewModel = RMCharacterEpisodeCollectionViewCellViewModel(
+                    episodeDataUrl: URL(string: episode.url),
+                    borderColor: borderColors.randomElement() ?? .systemBlue
+                )
                 
                 if !cellViewModels.contains(viewModel) {
                     cellViewModels.append(viewModel)
@@ -163,10 +178,11 @@ extension RMEpisodeListViewViewModel: UICollectionViewDataSource, UICollectionVi
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let bounds = UIScreen.main.bounds
-        let width = (bounds.width-30)/2
+        // let bounds = UIScreen.main.bounds
+        let bounds = collectionView.bounds // Other approach
+        let width = (bounds.width-20)
         
-        return CGSize(width: width, height: width * 0.8)
+        return CGSize(width: width, height: 100)
         
     }
     
@@ -255,5 +271,38 @@ Recap ) We essentially copied and pasted all of the elements for the Character L
 
 The most important bit is the business logic that we implemented in our RMEpisodeListViewViewModel.
 In particular, the logic that goes into fetching the initial set of Episodes, as well as fetching additional episodes.
+
+*/
+
+
+/*
+
+
+-> Improve Character Tab Section
+
+
+sizeForItemAt ) Currently, the cells that we are displaying in our collectionView are cutting off the text.
+So, we are going to make some changes to our collectionView's sizeForItemAt() Function.
+
+In this case we want to subtract 20 from the width of the cell instead of subtracting 30 and dividing it by 2.
+We want the height to be fixed, so we will set it to 100 instead of multuplying it by 0.8.
+
+We want to display a different color for each cell in our collectionView.
+To do so, we will make changes to the RMCharacterEpisodeCollectionViewCell.
+Headover to the RMCharacterEpisodeCollectionViewCell file.
+
+
+
+didSet ) Returning from the RMCharacterEpisodeCollectionViewCell file, we can see that our ViewModels are being created within the didSet property.
+
+So, we are going to call the borderColor argument we just set in RMCharacterEpisodeCollectionViewCell and we will set the value of the color by creating an Array of borderColors.
+
+Then, we are going to pass in the borderColors Array and invoke the .randomElement() Function.
+The .randomElement() Function returns an Optional so we will set a coalescent value in case of a nil value.
+
+With that out of the way, we will now build out our Episode Detail screen.
+Head over to the RMEpisodeDetailViewController.
+
+To configure our search funtionality, we are going to create a global search Controller that will be configured based on the Type we are searching, which would either be Character, Location, and Episode.
 
 */

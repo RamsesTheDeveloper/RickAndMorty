@@ -38,15 +38,19 @@ final class RMCharacterEpisodeCollectionViewCell: UICollectionViewCell {
         // contentView.backgroundColor = .systemPurple
         // contentView.backgroundColor = .systemBackground
         contentView.backgroundColor = .tertiarySystemBackground
-        contentView.layer.cornerRadius = 8
-        contentView.layer.borderWidth = 2
-        contentView.layer.borderColor = UIColor.systemBlue.cgColor
+        setUpLayer()
         contentView.addSubviews(seasonLabel, nameLabel, airDateLabel)
         setUpConstraints()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setUpLayer() {
+        contentView.layer.cornerRadius = 8
+        contentView.layer.borderWidth = 2
+        // contentView.layer.borderColor = UIColor.systemBlue.cgColor
     }
     
     private func setUpConstraints() {
@@ -91,6 +95,7 @@ final class RMCharacterEpisodeCollectionViewCell: UICollectionViewCell {
         }
         
         viewModel.fetchEpisode()
+        contentView.layer.borderColor = viewModel.borderColor.cgColor
     }
 }
 
@@ -137,5 +142,28 @@ Recap ) After the RMEpisodeDetailViewController was created, the instructor prov
 We used RMCharacterDetailViewController's didSelectItemAt() Function to get the section of the selected ViewModel (the cell that the user is tapping on), then from the position in that section, we get the episode by exposing the episodes Collection for the RMCharacterDetailView instance in RMCharacterDetailViewController which was done in RMCharacterDetailViewViewModel, and then we created an instance RMEpisodeDetailViewController and passed in the URL.
 
 
+
+*/
+
+
+/*
+
+
+-> Improve Character Tab Section
+
+
+setUpLayer ) To make changes to the cell displayed in our RMEpisodeListView, we are going to abstract the Layer code into a Function called setUpLayer() which we will called within the overridden initializer.
+
+As of now, the border color of the cell is .systemBlue.
+We want to get the color from the viewModel or at least have a default color declared in the viewModel.
+
+
+
+configure ) The setUpLayer() Function is setting the borderColor of our cell.
+We want the viewModel to set the borderColor, so we are going to remove that line of code from the setUpLayer() Function and move it into the configure() Function.
+
+Then, instead of assigning the borderColor directly, we will declare a borderColor property within our viewModel that will set the color of that one cell in the collectionView.
+
+Head over to the RMCharacterEpisodeCollectionViewCellViewModel file.
 
 */

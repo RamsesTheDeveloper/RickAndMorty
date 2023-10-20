@@ -5,7 +5,7 @@
 //  Created by Ramsés Abdala on 10/12/23.
 //
 
-import Foundation
+import UIKit
 
 protocol RMEpisodeDataRender {
     var name: String { get }
@@ -19,6 +19,8 @@ final class RMCharacterEpisodeCollectionViewCellViewModel: Hashable, Equatable {
     private var isFetching = false
     private var dataBlock: ((RMEpisodeDataRender) -> Void)?
     
+    public let borderColor: UIColor
+    
     private var episode: RMEpisode? {
         didSet {
             guard let model = episode else {
@@ -29,8 +31,9 @@ final class RMCharacterEpisodeCollectionViewCellViewModel: Hashable, Equatable {
         }
     }
     
-    init(episodeDataUrl: URL?) {
+    init(episodeDataUrl: URL?, borderColor: UIColor = .systemBlue) {
         self.episodeDataUrl = episodeDataUrl
+        self.borderColor = borderColor // Retains argument passed in by caller.
     }
     
     // MARK: - Public
@@ -183,5 +186,24 @@ This is an edge case because if we've already fetched the data, and the user bri
 Meaning that if the model that we have for the Character reflects the model that we are receiving from
 Head over to RMCharacterEpisodeCollectionViewCell.
 
+
+*/
+
+
+/*
+
+
+-> Improve Character Tab Section
+
+
+borderColor ) Coming from the RMCharacterEpisodeCollectionViewCell, we are going to implement a borderColor property within our RMCharacterEpisodeCollectionViewCellViewModel.
+
+To begin, we are going to set another parameter to our RMCharacterEpisodeCollectionViewCellViewModel's initializer.
+That parameter will be borderColor with a default value of .systemBlue.
+
+Then, at the top, we are going to create a public Constant called borderColor of Type UIColor.
+Doing so will prompt us to import UIKit at the top.
+
+Head over to the RMEpisodeListViewViewModel file.
 
 */
