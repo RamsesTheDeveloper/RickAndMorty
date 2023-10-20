@@ -24,13 +24,9 @@ final class RMEpisodeListViewViewModel: NSObject {
         didSet {
             // print("Creating ViewModels")
             for episode in episodes {
-//                let viewModel = RMEpisodeCollectionViewCellViewModel(
-//                    characterName: character.name,
-//                    characterStatus: character.status,
-//                    characterImageUrl: URL(string: character.image)
-//                )
                 
-                // If the viewModel created is not contained in our Array, then insert it.
+                let viewModel = RMCharacterEpisodeCollectionViewCellViewModel(episodeDataUrl: URL(string: episode.url))
+                
                 if !cellViewModels.contains(viewModel) {
                     cellViewModels.append(viewModel)
                 }
@@ -40,20 +36,20 @@ final class RMEpisodeListViewViewModel: NSObject {
     
     // private var cellViewModels: [RMEpisodeCollectionViewCellViewModel] = []
     private var cellViewModels: [RMCharacterEpisodeCollectionViewCellViewModel] = []
-    private var apiInfo: RMGetAllCharactersResponse.Info? = nil
+    private var apiInfo: RMGetAllEpisodesResponse.Info? = nil
     
-    /// Fetch initial set of characters (20)
-    public func fetchCharacters() {
-        RMService.shared.execute(.listCharactersRequests, expecting: RMGetAllCharactersResponse.self) { [weak self] result in
+    /// Fetch initial set of episodes (20)
+    public func fetchEpisodes() {
+        RMService.shared.execute(.listEpisodesRequest, expecting: RMGetAllEpisodesResponse.self) { [weak self] result in
             switch result {
             case .success(let responseModel):
                 let results = responseModel.results
                 let info = responseModel.info
                 
-                self?.characters = results
+                self?.episodes = results
                 self?.apiInfo = info
                 DispatchQueue.main.async {
-                    self?.delegate?.didLoadInitialCharacters()
+                    self?.delegate?.didLoadInitialEpisodes()
                 }
             case .failure(let error):
                 print(String(describing: error))
@@ -61,8 +57,8 @@ final class RMEpisodeListViewViewModel: NSObject {
         }
     }
     
-    /// Paginate if additional characters are needed
-    public func fetchAdditionalCharacters(url: URL) {
+    /// Paginate if additional episodes are needed
+    public func fetchAdditionalEpisodes(url: URL) {
         guard !isLoadingMoreCharacters else {
             return
         }
@@ -77,7 +73,7 @@ final class RMEpisodeListViewViewModel: NSObject {
         print("Fetch Function is running")
         RMService.shared.execute(
             request,
-            expecting: RMGetAllCharactersResponse.self) { [weak self] result in
+            expecting: RMGetAllEpisodesResponse.self) { [weak self] result in
                 guard let strongSelf = self else {
                     return
                 }
@@ -88,7 +84,7 @@ final class RMEpisodeListViewViewModel: NSObject {
                     strongSelf.apiInfo = info
                     
                     // Helps calculate the collectionView's indexPath
-                    let originalCount = strongSelf.characters.count
+                    let originalCount = strongSelf.episodes.count
                     let newCount = moreResults.count
                     let total = originalCount + newCount
                     
@@ -101,9 +97,9 @@ final class RMEpisodeListViewViewModel: NSObject {
                     
                     // print(indexPathsToAdd)
                     
-                    strongSelf.characters.append(contentsOf: moreResults)
+                    strongSelf.episodes.append(contentsOf: moreResults)
                     DispatchQueue.main.async {
-                        strongSelf.delegate?.didLoadMoreCharacters(with: indexPathsToAdd)
+                        strongSelf.delegate?.didLoadMoreEpisodes(with: indexPathsToAdd)
                         strongSelf.isLoadingMoreCharacters = false
                     }
                 case .failure(let failure):
@@ -130,9 +126,9 @@ extension RMEpisodeListViewViewModel: UICollectionViewDataSource, UICollectionVi
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: RMEpisodeCollectionViewCell.cellIdentifier,
+            withReuseIdentifier: RMCharacterEpisodeCollectionViewCell.cellIdentifier,
             for: indexPath
-        ) as? RMEpisodeCollectionViewCell else {
+        ) as? RMCharacterEpisodeCollectionViewCell else {
             fatalError("Unsupported cell")
         }
         
@@ -170,14 +166,14 @@ extension RMEpisodeListViewViewModel: UICollectionViewDataSource, UICollectionVi
         let bounds = UIScreen.main.bounds
         let width = (bounds.width-30)/2
         
-        return CGSize(width: width, height: width * 1.5)
+        return CGSize(width: width, height: width * 0.8)
         
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        let character = characters[indexPath.row]
-        delegate?.didSelectCharacter(character)
+        let selection = episodes[indexPath.row]
+        delegate?.didSelectEpisode(selection)
     }
 }
 
@@ -199,7 +195,7 @@ extension RMEpisodeListViewViewModel: UIScrollViewDelegate {
             let totalScrollViewFixedHeight = scrollView.frame.size.height
             
             if offset >= (totalContentHeight - totalScrollViewFixedHeight - 120) {
-                self?.fetchAdditionalCharacters(url: url)
+                self?.fetchAdditionalEpisodes(url: url)
             }
             
             t.invalidate()
@@ -216,5 +212,48 @@ extension RMEpisodeListViewViewModel: UIScrollViewDelegate {
 cellViewModels ) We will be reusing the same Episode Cell that we've created for our RMCharacterDeatilView.
 So, in place of RMEpisodeCollectionViewCellViewModel, we are going to enter in RMCharacterEpisodeCollectionViewCellViewModel.
 
+
+*/
+
+
+/*
+
+
+-> Episode List View Section
+
+
+didSet ) In order for our didSet property to be able to iterate over an Array of RMCharacterEpisodeCollectionViewCellViewModel, the ViewModel will need to conform to Hashable and Equatable.
+
+So, open the RMCharacterEpisodeCollectionViewCellViewModel file and have the ViewModel adopt Hashable and Equatable.
+Then, at the bottom of the file, we will need to implement our hash(into:) Function.
+
+
+
+
+fetchEpisodes ) Our fetchEpisodes() Function's execute() Function requires that we provide a Model that reflects what is being received from the Rick and Morty API.
+
+That Model needs to reflect the cells in our EpisodeListView, so within the APIResponseTypes Group, we are going to create a Swift file called RMGetAllEpisodesResponse.
+
+
+
+RMGetAllEpisodesResponse ) We will copy the RMGetAllCharactersResponse Struct and paste it into the RMGetAllEpisodesResponse file.
+In this case, the model will be an Array of RMEpisode, instead of an Array of RMCharacter.
+
+
+
+.listEpisodesRequests ) At the moment, fetchEpisodes() Function's execute() Function is using the .listCharacterRequests, but what we want is a request for Episodes.
+
+So, within RMRequest's extension, we are going to set a Static Constant called listEpisodesRequest, which holdes an instance of RMRequest created with .episode instead of .character.
+
+Head over to the RMEpisodeListView file.
+Note that we changed the cell of the .register() Function within RMEpisodeListView's collectionView Constant.
+That cell is now the same as the one being displayed at the bottom of our RMCharacterDetailView.
+
+
+
+Recap ) We essentially copied and pasted all of the elements for the Character List such as the ViewModel, the list, and the Controller and renamed them.
+
+The most important bit is the business logic that we implemented in our RMEpisodeListViewViewModel.
+In particular, the logic that goes into fetching the initial set of Episodes, as well as fetching additional episodes.
 
 */
