@@ -21,7 +21,14 @@ final class RMEpisodeDetailViewViewModel {
         }
     }
     
+    enum SectionType {
+        case information(viewModels: [RMEpisodeInfoCollectionViewCellViewModel])
+        case characters(viewModel: [RMCharacterCollectionViewCellViewModel])
+    }
+    
     public weak var delegate: RMEpisodeDetailViewViewModelDelegate?
+    
+    public private(set) var sections: [SectionType] = []
     
     // MARK: - Initializer
     
@@ -219,5 +226,41 @@ didSet ) Once the group.notify() Function fires off, we will update our View wit
 Inside of didSet, we are going to call our delegate's didFetchEpisodeDetails() Function.
 
 Head over to the RMEpisodeDetailViewController file.
+
+*/
+
+
+/*
+
+
+-> Episode Detail Layout Section
+
+
+SectionType ) Coming from RMEpisodeDetailView.
+Within our RMEpisodeDetailViewViewModel Class, we are going to declare our section Types.
+
+At the top of the Class, we are going to declare our SectionType Enum with an information case with an associated value of RMEpisodeInfoCollectionViewCellViewModel and a characters case with an associated value of RMCharacterCollectionViewCellViewModel.
+
+
+
+RMEpisodeInfoCollectionViewCell ) The RMEpisodeInfoCollectionViewCellViewModel doesn't exist.
+So, within the Views Group, we are going to create a Group called EpisodeDetails.
+
+Within the EpisodeDetails Group we are going to create a UICollectionViewCell Cocoa Touch Class called RMEpisodeInfoCollectionViewCell.
+
+We will also move our RMEpisodeDetailView file into the EpisodeDetails Group.
+
+Once that is done, we are going to go into the ViewModels Group and we will create a Group Called EpisodeDetail, and we will move the RMEpisodeDetailViewViewModel into the EpisodeDetail Group.
+
+Then, we will create a Swift file called RMEpisodeInfoCollectionViewCellViewModel within the EpisodeDetail folder.
+The RMEpisodeInfoCollectionViewCellViewModel will be a Struct with public properties title and value of Type String.
+
+
+
+sections ) We will now create a public Variable Collection of Type SectionType.
+We want this Collection to be public, but we don't want the public world to set its value, so we are going to declare it public private(set), that way the property remains public, but we are not able to set its value outside of this file.
+
+Left off at Episode Detail Cells Section. Start at 8until13 video.
+
 
 */
