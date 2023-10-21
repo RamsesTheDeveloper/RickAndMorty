@@ -8,7 +8,7 @@
 import UIKit
 
 /// VC to show details about single episode
-final class RMEpisodeDetailViewController: UIViewController {
+final class RMEpisodeDetailViewController: UIViewController, RMEpisodeDetailViewViewModelDelegate {
     
     // private let url: URL?
     private let viewModel: RMEpisodeDetailViewViewModel
@@ -34,6 +34,9 @@ final class RMEpisodeDetailViewController: UIViewController {
         title = "Episode"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapShare))
+        
+        viewModel.delegate = self
+        viewModel.fetchEpisodeData()
     }
     
     private func addConstraints() {
@@ -47,6 +50,13 @@ final class RMEpisodeDetailViewController: UIViewController {
     
     @objc
     private func didTapShare() {
+    }
+    
+    // MARK: - Delegate
+    
+    // The Delegate MARK reminds us that we are implementing Delegate Functions.
+    func didFetchEpisodeDetails() {
+        detailView.configure(with: viewModel)
     }
 }
 
@@ -126,5 +136,39 @@ This will be the Controller that we will use to provide the configuration for se
 After the RMSearchViewController is created, we are going to return to the RMCharacterViewController and within the didTapSearch() Function, we are going to instantiate an instance of RMSearchViewController with a `Type` of .character.
 
 Once we've created our instance, we are going to push to it.
+
+*/
+
+
+/*
+
+
+-> Episode Detail View Section
+
+
+Coming from RMEpisodeDetailViewViewModel.
+Currently, we are passing in an instance of RMEpisodeDetailViewViewModel to our RMEpisodeDetailViewController and we are creating an instance of RMEpisodeDetailView.
+
+What we want to do now is assign our Delegate to the View via our ViewModel before we start fetching.
+Meaning that we need to link our Delegate to our View, so that we can update it when our DispatchGroup is done running.
+
+The edge cases that we are addressing is that our fetchEpisodeData() Function finishes before our RMEpisodeDetailViewViewModel's delegate property is assigned.
+
+So, we are going to make the fetchEpisodeData() Function public, before it was private.
+
+
+
+viewDidLoad ) Within the viewDidLoad() Function, we are going to access our viewModel's .delegate property and we are going to assign it a value of self, which will be the RMEpisodeDetailViewController Class.
+
+To do so, our RMEpisodeDetailViewController Class will need to adopt the RMEpisodeDetailViewViewModelDelegate Protocol.
+Once we've adopted the RMEpisodeDetailViewViewModelDelegate Protocol, we are going to call the .fetchEpisodeData() Function on our ViewModel.
+
+
+
+didFetchEpisodeDetails ) To conform to the RMEpisodeDetailViewViewModelDelegate Protocol, we are going to implement the didFetchEpisodeDetails() Function at the bottom of our RMEpisodeDetailViewController Class.
+
+Inside of the Function, we are going to call our detailView's .configure() Function and pass in our ViewModel.
+Head over to the RMEpisodeDetailView file.
+
 
 */
