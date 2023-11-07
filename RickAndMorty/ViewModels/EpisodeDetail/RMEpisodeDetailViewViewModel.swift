@@ -17,6 +17,7 @@ final class RMEpisodeDetailViewViewModel {
     
     private var dataTuple: (RMEpisode, [RMCharacter])? {
         didSet {
+            createCellViewModels()
             delegate?.didFetchEpisodeDetails()
         }
     }
@@ -58,6 +59,10 @@ final class RMEpisodeDetailViewViewModel {
     }
     
     // MARK: - Private
+    
+    private func createCellViewModels() {
+        
+    }
     
     private func fetchRelatedCharacters(episode: RMEpisode) {
         let requests: [RMRequest] = episode.characters.compactMap({
@@ -260,7 +265,39 @@ The RMEpisodeInfoCollectionViewCellViewModel will be a Struct with public proper
 sections ) We will now create a public Variable Collection of Type SectionType.
 We want this Collection to be public, but we don't want the public world to set its value, so we are going to declare it public private(set), that way the property remains public, but we are not able to set its value outside of this file.
 
-Left off at Episode Detail Cells Section. Start at 8until13 video.
+*/
+
+
+/*
+
+
+-> Episode Detail Cells Section
+
+
+Overview ) Previously, we discussed building out the CollectionView layout for the Episode Detail Screen. 
+Our Episode Detail Screen is going to have two different section Types, the first being Info and the other Characters.
+
+
+
+RMEpisodeDetailViewViewModel ) We are going to build out the ViewModels for the Characters and Info sections.
+Within our RMEpisodeDetailViewViewModel, we have an Enum called SectionType whch has two cases.
+
+The first case is information and the second case is characters.
+The information case has an associated value of RMEpisodeInfoCollectionViewCellViewModel while the characters case has an associated value of RMCharacterCollectionViewCellViewModel which we used in our previous screen(s).
+
+
+
+dataTuple ) Once we've set up our dataTuple (meaning that we've created an instance of dataTuple elsewhere in our program), we are going to create our ViewModels.
+
+Our dataTuple will receive ViewModels that we will use in our didSet property setter.
+Our didSet property setter is going to call the createCellViewModels() Function
+
+
+
+createCellViewModels ) We are going to take the dataTuple that we are receiving from RMEpisodeDetailViewViewModel's caller and we are going to construct our sections and store them in our sections Array.
+
+Within 
+
 
 
 */
