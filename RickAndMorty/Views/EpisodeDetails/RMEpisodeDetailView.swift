@@ -12,6 +12,7 @@ final class RMEpisodeDetailView: UIView {
     private var viewModel: RMEpisodeDetailViewViewModel? {
         didSet {
             spinner.stopAnimating()
+            self.collectionView?.reloadData()
             self.collectionView?.isHidden = false
             UIView.animate(withDuration: 0.3) {
                 self.collectionView?.alpha = 1
@@ -77,7 +78,17 @@ final class RMEpisodeDetailView: UIView {
         collectionView.alpha = 0
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell") // Base cell for development
+        // collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell") // Base cell for development
+        collectionView.register(
+            RMEpisodeInfoCollectionViewCell.self,
+            forCellWithReuseIdentifier: RMEpisodeInfoCollectionViewCell.cellIdentifier
+        )
+        
+        collectionView.register(
+            RMCharacterCollectionViewCell.self, 
+            forCellWithReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier
+        )
+        
         return collectionView
     }
     
@@ -90,17 +101,57 @@ final class RMEpisodeDetailView: UIView {
 
 extension RMEpisodeDetailView: UICollectionViewDelegate, UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return viewModel?.cellViewModels.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 10
+        guard let sections = viewModel?.cellViewModels else {
+            return 0
+        }
+        
+        let sectionType = sections[section]
+        
+        switch sectionType {
+        case .information(let viewModels):
+            return viewModels.count
+        case .characters(let viewModels):
+            return viewModels.count
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
-        cell.backgroundColor = .yellow
-        return cell
+        guard let sections = viewModel?.cellViewModels else {
+            fatalError("No ViewModel")
+        }
+        
+        let sectionType = sections[indexPath.section]
+        
+        switch sectionType {
+        case .information(let viewModels):
+            
+            let cellViewModel = viewModels[indexPath.row]
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RMEpisodeInfoCollectionViewCell.cellIdentifier, 
+                for: indexPath
+            ) as? RMEpisodeInfoCollectionViewCell else {
+                fatalError()
+            }
+            
+            cell.configure(with: cellViewModel)
+            return cell
+            
+        case .characters(let viewModels):
+            let cellViewModel = viewModels[indexPath.row]
+            guard let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: RMCharacterCollectionViewCell.cellIdentifier,
+                for: indexPath
+            ) as? RMCharacterCollectionViewCell else {
+                fatalError()
+            }
+            
+            cell.configure(with: cellViewModel)
+            return cell
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -188,5 +239,66 @@ We want out collectionView to show the name, air_data, and episode.
 We also want another section that is going to show the Character's image.
 
 Head over to the RMEpisodeDetailViewViewModel file.
+
+*/
+
+
+/*
+
+
+-> Episode Detail Cells Section
+
+reloadData ) Coming from RMEpisodeDetailViewViewModel, we are calling the .reloadData() Function on our collectionView.
+Calling the .reloadData() Function within our didSet property setter will cuase our UICollectionViewDelegate and UICollectionViewDataSource Functions to run again.
+
+Meaning that the Functions in our extension are going to run whenever our RMEpisodeDetailViewViewModel's dataTuple receives data.
+dataTuple receives data and uses that data to create ViewModels, those ViewModels are passed from RMEpisodeDetailViewViewModel to the RMEpisodeDetailViewController which uses the ViewModels it receives to configure its RMEpisodeDetailView instance via the configure() Function, and the configure() Function is declared in RMEpisodeDetailView and it assigns the ViewModel to its viewModel instance that reloads the Episode detail screen.
+
+
+
+numberOfSections ) For our numberOfSections() Function, we are going to return the count of our cellViewModels or zero.
+
+
+
+numberOfItemsInSection ) Within the numberOfItemsInSection() Function, we are going to create a sections Constant and assign it the cellViewModels we are receiving and then we are going to create a sectionType Constant.
+
+sectionType will receive a value by accessing the cellViewModels that are stored in the sections Constant and passing in the section that we are receiving from the numberOfItemsInSection() Function.
+
+We will then switch on the sectionType and we will return count of the viewModels for the characters case and the information case.
+To summarize, we are getting the sections from the ViewModel, we are unwrapping them because the ViewModel is optional, we get the sectionType and based on the Type we are going to return how many items should be in that section.
+
+
+
+createCollectionView ) Within the createCollectionView() Function we are going to .register() the appropriate cell.
+One of them is the RMEpisodeInfoCollectionViewCell, we haven't created an identifier for RMEpisodeInfoCollectionViewCell, so we will have to do that in the RMEpisodeInfoCollectionViewCell file.
+
+We will also go through the same process for the RMCharacterCollectionViewCell, but RMCharacterCollectionViewCell already has a cellIdentifier.
+
+
+
+cellForItemAt ) Our cellForItemAt() Function is going to throw a fatalError(), but it should never do that because we are returning 0 in our numberOfSections() Function and numberOfItemsInSection() Function.
+
+Once we have our sections, we are going to access the indexPath.section and store it in the sectionType Constant.
+Once we have the sectionType, we can dequeue and return the appropriate cell.
+
+
+
+Data To Cell ) Our goal is to take the data we are receiving from the ViewModel and putting it into a cell, that's done by creating a our cell and then configuring it with the ViewModel that we are receiving for that indexPath.
+
+Within our switch, we are going to call the .dequeueReusableCell() Function in our information case and our characters case.
+
+To do that, we will need the cellViewModel which is the indexPath.row element in our Collection.
+Then, we are going to create the cell, meaning that we are going to create an empty box where we will store the cell.
+Finally, we configure our empty cell with the ViewModel we are receiving.
+
+Essentially, we are creating an empty cell and we are filling it with the ViewModel that we are receiving from RMEpisodeDetailViewViewModel.
+
+The same will be done for RMCharacterCollectionViewCell.
+
+This was the code that we had before we made changes to the cellForItemAt() Function :
+
+    let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+    cell.backgroundColor = .yellow
+    return cell
 
 */

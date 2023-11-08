@@ -15,7 +15,7 @@ final class RMEpisodeDetailViewViewModel {
     
     private let endpointUrl: URL?
     
-    private var dataTuple: (RMEpisode, [RMCharacter])? {
+    private var dataTuple: (episode: RMEpisode, characters: [RMCharacter])? {
         didSet {
             createCellViewModels()
             delegate?.didFetchEpisodeDetails()
@@ -29,7 +29,8 @@ final class RMEpisodeDetailViewViewModel {
     
     public weak var delegate: RMEpisodeDetailViewViewModelDelegate?
     
-    public private(set) var sections: [SectionType] = []
+    // public private(set) var sections: [SectionType] = []
+    public private(set) var cellViewModels: [SectionType] = []
     
     // MARK: - Initializer
     
@@ -61,7 +62,27 @@ final class RMEpisodeDetailViewViewModel {
     // MARK: - Private
     
     private func createCellViewModels() {
+        guard let dataTuple = dataTuple else {
+            return
+        }
         
+        let episode = dataTuple.episode
+        let characters = dataTuple.characters
+        
+        cellViewModels = [
+            .information(viewModels: [
+                .init(title: "Episode Name", value: episode.name),
+                .init(title: "Air Date", value: episode.air_date),
+                .init(title: "Episode", value: episode.episode),
+                .init(title: "Created", value: episode.created),
+            ]),
+            .characters(viewModel: characters.compactMap({ character in
+                return RMCharacterCollectionViewCellViewModel(
+                    characterName: character.name,
+                    characterStatus: character.status,
+                    characterImageUrl: URL(string: character.image))
+            }))
+        ]
     }
     
     private func fetchRelatedCharacters(episode: RMEpisode) {
@@ -90,7 +111,7 @@ final class RMEpisodeDetailViewViewModel {
         }
         
         group.notify(queue: .main) {
-            self.dataTuple = (episode, characters)
+            self.dataTuple = (episode: episode, characters: characters)
         }
     }
 }
@@ -296,8 +317,58 @@ Our didSet property setter is going to call the createCellViewModels() Function
 
 createCellViewModels ) We are going to take the dataTuple that we are receiving from RMEpisodeDetailViewViewModel's caller and we are going to construct our sections and store them in our sections Array.
 
-Within 
+Within our createCellViewModels() Function, we are going to fill in the sections Array.
+Inside of the sections Array, we are going to use the dot operator to access the characters and information cases.
 
+information's .init() asks for a title and value.
+Our dataTuple has these values, so at the top of the createCellViewModels() Function, we are going to declare a Constant called episode and we will assign it the value of dataTuple at 1 :
+
+    let episode = dataTuple.1
+
+At this point in our program, we can either use the index of 1 or the index of 0.
+However, we can also change our dataTuple's declaration from :
+
+    private var dataTuple: (RMEpisode, [RMCharacter])? { ... }
+
+To :
+
+    private var dataTuple: (episode: RMEpisode, characters: [RMCharacter])? { ... }
+
+We can now use the name of our argument instead of the index :
+
+    let episode = dataTuple.episode
+
+We can now pull values out of the episode within our information case :
+
+    .information(viewModels: [
+
+        .init(title: "Episode Name", value: episode.name),
+        ...
+
+
+    ])
+
+For our characters case, we are going to map our Character models to instances of RMCharacterCollectionViewCellViewModel.
+That concludes the creation of our ViewModels.
+
+
+
+cellViewModels ) We are going to rename our sections Array to cellViewModels.
+Now that we have our cellViewModels populating, we are going to communicate with our Delegate.
+
+Our dataTuple is performing two tasks, the first task is creating our cellViewModels and the second task is notifying our Delegate that the episode's details have been fetched.
+
+RMEpisodeDetailViewController is adopting our RMEpisodeDetailViewViewModelDelegate by implementing the didFetchEpisodeDetails() Function.
+However, the didFetchEpisodeDetails() Function is calling our detailView's .configure() and passing in a viewModel.
+
+The purpose of the .configure() Function is to tell the detailView to configure itself with a given viewModel.
+The configure() Function is declared in the RMEpisodeDetailView Class.
+
+The configure() Function receives the viewModel and it assigns the viewModel that it receives to the viewModel that is declared within the RMEpisodeDetailView Class.
+
+RMEpisodeDetailView's viewModel Variable shows the collectionView once a value has been assigned to the viewModel.
+However, the change we want to make is call .reloadData() before we set .isHidden to false.
+Head over to the RMEpisodeDetailView file.
 
 
 */
