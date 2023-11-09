@@ -202,5 +202,8 @@ Once we have that in place, we need to push to the RMCharacterDetailViewControll
 With this design, we are heavily reusing our ViewControllers, but it makes out application interactive.
 This design is neat because we can cyclically continue in the same navigation pattern, meaning that we can continue tapping on Episodes and tapping on Characters and then tap on Episodes.
 
+We are going to build out our Settings screen.
+Head over to the RMSettingsViewController file.
+
 
 */
