@@ -7,7 +7,16 @@
 
 import UIKit
 
+protocol RMEpisodeDetailViewDelegate: AnyObject {
+    func rmEpisodeDetailView(
+        _ detailView: RMEpisodeDetailView,
+        didSelect character: RMCharacter
+    )
+}
+
 final class RMEpisodeDetailView: UIView {
+    
+    public weak var delegate: RMEpisodeDetailViewDelegate?
 
     private var viewModel: RMEpisodeDetailViewViewModel? {
         didSet {
@@ -156,6 +165,23 @@ extension RMEpisodeDetailView: UICollectionViewDelegate, UICollectionViewDataSou
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true) // Unhighlights the cell selected.
+        
+        guard let viewModel = viewModel else {
+            return
+        }
+        
+        let sections = viewModel.cellViewModels
+        let sectionType = sections[indexPath.section]
+        
+        switch sectionType {
+        case .information:
+            break
+        case .characters:
+            guard let character = viewModel.character(at: indexPath.row) else {
+                return
+            }
+            delegate?.rmEpisodeDetailView(self, didSelect: character)
+        }
     }
 }
 
@@ -178,7 +204,7 @@ extension RMEpisodeDetailView {
         
         item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         
-        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(100)), subitems: [item])
+        let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(80)), subitems: [item])
         
         let section = NSCollectionLayoutSection(group: group)
         
@@ -366,6 +392,65 @@ We will also set .contentInsets on our item Constant.
 
 Now that our RMCharacterCollectionViewCell is set up, we are going to create our RMEpisodeInfoCollectionViewCell.
 Head over to the RMEpisodeInfoCollectionViewCell file.
+
+The height of createInfLayout() group was changed from 100 to 80.
+
+*/
+
+
+/*
+
+
+-> Finish Episode Details Section
+
+
+RMEpisodeDetailViewDelegate ) Coming from RMEpisodeDetailViewViewModel, we want to leverage a Delegate to get to the selection out of our View.
+RMEpisodeDetailView is the file that holds our collectionView.
+
+We need a Delegate for our cell, so at the top of our file we are going to declare a Protocol called RMEpisodeDetailViewDelegate.
+The Protocol will be of Type AnyObject, that way our delegate Variable within our RMEpisodeDetailView Class can be a weak reference.
+
+Inside of the Protocol we are going to declare a Function called rmEpisodeDetailView() with a detailView parameter, this is a common naming convention.
+
+We always pass in a reference of the View that is triggering the call.
+In this case, RMEpisodeDetailView is the View triggering the call, that is why we give our detailView parameter a Type of RMEpisodeDetailView.
+
+The other value that we will need to pass in is the instance of RMCharacter that was selected, this is represented by the character parameter.
+
+
+
+didSelectItemAt ) In our didSelectItemAt() Function, we can access our selection.
+We access our selection by switching on the sectionType that we are receiving from cellViewModels.
+
+In this case, we are not working with the information case, so we are going to break out of it.
+
+We are working with the characters case, but the RMCharacterCollectionViewCellViewModel does not have an instance of RMCharacter.
+So, the next thing we will have to do is get a particular Character out of position.
+
+Instead of using viewModels in our characters case, we are going to use the indexPath.
+We will use the indexPath to check in the RMEpisodeDetailViewViewModel that we have a Character at that position (at that indexPath).
+
+The first approach would have had us access the characters case's RMCharacter instance, but we are going to access the position of RMEpisodeDetailViewViewModel's dataTuple's character Array.
+
+RMEpisodeDetailViewViewModel's dataTuple's character Array holds the position of the RMCharacter instance because it is of Type RMCharacter.
+
+
+
+sectionType ) With the information above, we are going to unwrap RMEpisodeDetailView's viewModel, we will save our viewModel's cellViewModels to the sections Constant, and we will need to access the sectionType which we will use to switch on.
+
+In the characters case, we are going to pass in our indexPath.row to RMEpisodeDetailViewViewModel's .character(at:) Function which does not exist.
+After that is finished, we are going to pass the character Constant into our delegate's .rmEpisodeDetailView() Function.
+We are going to create our .character(at:) Function within the RMEpisodeDetailViewViewModel file.
+
+Head over to the RMEpisodeDetailViewViewModel file.
+
+
+
+character ) Returning from RMEpisodeDetailViewViewModel, we need to error check the didSelectItemAt() Function's character Constant before we pass it into our delegate's .rmEpisodeDetailView() Function.
+
+As of now, we have our RMCharacter instance, but we haven't assigned a Delegate to our property, that will be done in the RMEpisodeDetailViewController.
+
+Head over to the RMEpisodeDetailViewController file.
 
 
 */

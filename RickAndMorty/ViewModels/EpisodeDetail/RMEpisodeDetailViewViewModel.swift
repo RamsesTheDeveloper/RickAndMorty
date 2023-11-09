@@ -36,7 +36,7 @@ final class RMEpisodeDetailViewViewModel {
     
     init(endpointUrl: URL?) {
         self.endpointUrl = endpointUrl
-        fetchEpisodeData()
+        // fetchEpisodeData()
     }
     
     // MARK: - Public
@@ -59,6 +59,14 @@ final class RMEpisodeDetailViewViewModel {
         }
     }
     
+    public func character(at index: Int) -> RMCharacter? {
+        guard let dataTuple = dataTuple else {
+            return nil
+        }
+        
+        return dataTuple.characters[index]
+    }
+    
     // MARK: - Private
     
     private func createCellViewModels() {
@@ -69,12 +77,17 @@ final class RMEpisodeDetailViewViewModel {
         let episode = dataTuple.episode
         let characters = dataTuple.characters
         
+        var createdString = episode.created
+        if let date = RMCharacterInfoCollectionViewCellViewModel.dateFormatter.date(from: episode.created) {
+            createdString = RMCharacterInfoCollectionViewCellViewModel.shortDateFormatter.string(from: date)
+        }
+        
         cellViewModels = [
             .information(viewModels: [
                 .init(title: "Episode Name", value: episode.name),
                 .init(title: "Air Date", value: episode.air_date),
                 .init(title: "Episode", value: episode.episode),
-                .init(title: "Created", value: episode.created),
+                .init(title: "Created", value: createdString),
             ]),
             .characters(viewModel: characters.compactMap({ character in
                 return RMCharacterCollectionViewCellViewModel(
@@ -370,5 +383,37 @@ RMEpisodeDetailView's viewModel Variable shows the collectionView once a value h
 However, the change we want to make is call .reloadData() before we set .isHidden to false.
 Head over to the RMEpisodeDetailView file.
 
+
+*/
+
+
+/*
+
+
+-> Finish Episode Details Section
+
+
+createdString ) Coming from the RMEpisodeInfoCollectionViewCell file, we are going to format our date.
+Within the createCellViewModels() Function, we are going to create a Variable called createdString with an initial value of empty String.
+
+To create our date, we will access RMCharacterInfoCollectionViewCellViewModel's .dateFormatter and call the .date(from:) Function and pass in the episode's .created value which will return an Optional that will unwrap and pass into RMCharacterInfoCollectionViewCellViewModel's .shortDateFormatter .string(From) Function.
+
+We want the user to be able to tap on a Character from the Episode detail screen and segue into the Character Detail screen.
+To do that, we will need to make changes to our RMEpisodeDetailView.
+Head over to the RMEpisodeDetailView file.
+
+
+
+character ) Coming from RMEpisodeDetailView, we are going to create our character(at:) Function.
+We are going to create a public Function that will take an index parameter of Type Int.
+
+Within the Function, we are going to access the dataTuple.
+In the case of not having a DataTuple, we are going to return nil, which requires that we make our return Type Optional RMCharacter.
+
+If we do have a dataTuple, we are going to return the dataTuple's .characters at the index that we passed in.
+
+Given that our Function's return Type is Optional, we now have to check for a value within RMEpisodeDetailView's didSelectItemAt() Function before we pass it into the delegate's .rmEpisodeDetailView().
+
+Head over to the RMEpisodeDetailView file.
 
 */

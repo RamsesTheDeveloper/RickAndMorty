@@ -8,7 +8,7 @@
 import UIKit
 
 /// VC to show details about single episode
-final class RMEpisodeDetailViewController: UIViewController, RMEpisodeDetailViewViewModelDelegate {
+final class RMEpisodeDetailViewController: UIViewController, RMEpisodeDetailViewViewModelDelegate, RMEpisodeDetailViewDelegate {
     
     // private let url: URL?
     private let viewModel: RMEpisodeDetailViewViewModel
@@ -31,6 +31,7 @@ final class RMEpisodeDetailViewController: UIViewController, RMEpisodeDetailView
         super.viewDidLoad()
         view.addSubview(detailView)
         addConstraints()
+        detailView.delegate = self
         title = "Episode"
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapShare))
@@ -52,7 +53,15 @@ final class RMEpisodeDetailViewController: UIViewController, RMEpisodeDetailView
     private func didTapShare() {
     }
     
-    // MARK: - Delegate
+    // MARK: - View Delegate
+    func rmEpisodeDetailView(_ detailView: RMEpisodeDetailView, didSelect character: RMCharacter) {
+        let vc = RMCharacterDetailViewController(viewModel: .init(character: character))
+        vc.title = character.name
+        vc.navigationItem.largeTitleDisplayMode = .never
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    // MARK: - ViewModel Delegate
     
     // The Delegate MARK reminds us that we are implementing Delegate Functions.
     func didFetchEpisodeDetails() {
@@ -169,6 +178,29 @@ didFetchEpisodeDetails ) To conform to the RMEpisodeDetailViewViewModelDelegate 
 
 Inside of the Function, we are going to call our detailView's .configure() Function and pass in our ViewModel.
 Head over to the RMEpisodeDetailView file.
+
+
+*/
+
+
+/*
+
+
+-> Finish Episode Details Section
+
+
+delegate ) Coming from RMEpisodeDetailView, we are going to assign our RMEpisodeDetailView's delegate equal to self within viewDidLoad().
+We need our Controller to adopt RMEpisodeDetailViewDelegate, so we will adopt it and we will conform to it by implementing the rmEpisodeDetailView() Function.
+
+The last step we take after selecting a Character is create an RMCharacterDetailViewController with the selected RMCharacter instance.
+The RMCharacterDetailViewController has an initializer that takes a viewModel, we are going to pass the RMCharacter instance that we are receiving from RMEpisodeDetailViewViewModel's dataTuple.
+
+Before we push into the RMCharacterDetailViewController, we are going to set the title equal to the Character's name and set the .largetTitleDisplayMode equal to .never so that we stay consistent with our initial RMCharacterDetailViewController screen.
+
+Once we have that in place, we need to push to the RMCharacterDetailViewController.
+
+With this design, we are heavily reusing our ViewControllers, but it makes out application interactive.
+This design is neat because we can cyclically continue in the same navigation pattern, meaning that we can continue tapping on Episodes and tapping on Characters and then tap on Episodes.
 
 
 */
