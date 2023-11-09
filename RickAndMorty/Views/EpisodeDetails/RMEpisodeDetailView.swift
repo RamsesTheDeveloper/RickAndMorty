@@ -160,12 +160,52 @@ extension RMEpisodeDetailView: UICollectionViewDelegate, UICollectionViewDataSou
 }
 
 extension RMEpisodeDetailView {
-    private func layout(for section: Int) -> NSCollectionLayoutSection {
+    func layout(for section: Int) -> NSCollectionLayoutSection {
+        guard let sections = viewModel?.cellViewModels else {
+            return createInfoLayout()
+        }
+        
+        switch sections[section] {
+        case .information:
+            return createInfoLayout()
+        case .characters:
+            return createCharacterLayout()
+        }
+    }
+    
+    func createInfoLayout() -> NSCollectionLayoutSection {
         let item = NSCollectionLayoutItem(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1)))
         
         item.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         
         let group = NSCollectionLayoutGroup.vertical(layoutSize: .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(100)), subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        return section
+    }
+    
+    func createCharacterLayout() -> NSCollectionLayoutSection {
+        let item = NSCollectionLayoutItem(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(0.5),
+                heightDimension: .fractionalHeight(1.0))
+        )
+        
+        item.contentInsets = NSDirectionalEdgeInsets(
+            top: 5,
+            leading: 10,
+            bottom: 5,
+            trailing: 10
+        )
+        
+        let group = NSCollectionLayoutGroup.horizontal(
+            layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0), 
+                heightDimension: .absolute(260)
+            ),
+            subitems: [item, item]
+        )
         
         let section = NSCollectionLayoutSection(group: group)
         
@@ -300,5 +340,27 @@ This was the code that we had before we made changes to the cellForItemAt() Func
     let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
     cell.backgroundColor = .yellow
     return cell
+
+
+
+layout ) As of now, our simulator is displaying 4 RMEpisodeInfoCollectionViewCells and an Array of RMCharacterCollectionViewCell.
+The cells that are appearing on the screen as distorted because we need to create appropriate layouts for both of our sections (Info/Character).
+
+Right now we are only returning the layout for the information cell.
+We are going to copy the code from the layout() Function and we are going to paste it into the createInfoLayout() Function.
+
+Within the layout() Function, we are going to access our cellViewModels and store them in the sections Constant.
+If we don't have our cellViewModels, we are going to return our default createInfoLayout() Function.
+
+If we do have our cellViewModels, we are going to switch on the section that is being passed into the layout() Function.
+Based on the case, we are going to call a different layout Function.
+
+
+
+createCharacterLayout ) In the case of Character, we are going to create our createCharacterLayout() Function.
+We want our item to have .fractionalWidth(0.5) because we want to fit two items per group.
+
+We are entering 2 item instances into our subitems Array, that is why we need the item to be 0.5 of the its underlying group.
+
 
 */
