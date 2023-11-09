@@ -361,6 +361,11 @@ createCharacterLayout ) In the case of Character, we are going to create our cre
 We want our item to have .fractionalWidth(0.5) because we want to fit two items per group.
 
 We are entering 2 item instances into our subitems Array, that is why we need the item to be 0.5 of the its underlying group.
+We want the height of the group to be 260, which would make the height of each of our item instances 260.
+We will also set .contentInsets on our item Constant.
+
+Now that our RMCharacterCollectionViewCell is set up, we are going to create our RMEpisodeInfoCollectionViewCell.
+Head over to the RMEpisodeInfoCollectionViewCell file.
 
 
 */
