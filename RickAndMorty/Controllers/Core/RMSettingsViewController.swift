@@ -9,6 +9,12 @@ import UIKit
 
 /// Controller to show various app options and settings
 final class RMSettingsViewController: UIViewController {
+    
+    private let viewModel = RMSettingsViewViewModel(
+        cellViewModels: RMSettingsOption.allCases.compactMap({
+        return RMSettingsCellViewModel(type: $0)
+    })
+    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,5 +62,19 @@ We are going to make our Enum CaseIterable so that we can loop over all of the c
 Inside of our Enum, we are going to compute the title and image of our cases.
 
 Head over to RMSettingsOption.
+
+
+
+viewModel ) Coming from RMSettingsCellViewModel, we are going to declare a private Constant at the top called viewModel of Type RMSettingsViewViewModel.
+
+RMSettingsViewViewModel is created with a Collection of RMSettingsCellViewModel and in order to initialize an instance of RMSettingsCellViewModel, we need to provide an RMSettingsOption instance, in this case we are going to return allCases.
+
+We want to compactMap .allCases, which means that we are going to loop over all of our cases and we are going to create an instance of RMSettingsCellViewModel for each case in our RMSettingsOption Enum.
+
+This is done by passing in $0 as the argument of type.
+
+Head over to RMSettingsOption.
+
+
 
 */
