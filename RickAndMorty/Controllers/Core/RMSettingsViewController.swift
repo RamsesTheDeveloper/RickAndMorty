@@ -5,22 +5,43 @@
 //  Created by Ramsés Abdala on 9/27/23.
 //
 
+import SwiftUI
 import UIKit
 
 /// Controller to show various app options and settings
 final class RMSettingsViewController: UIViewController {
     
-    private let viewModel = RMSettingsViewViewModel(
-        cellViewModels: RMSettingsOption.allCases.compactMap({
-        return RMSettingsCellViewModel(type: $0)
-    })
+    private let settingsSwiftUIController = UIHostingController(
+        rootView: RMSettingsView(
+            viewModel: RMSettingsViewViewModel(
+                cellViewModels: RMSettingsOption.allCases.compactMap({
+                    return RMSettingsCellViewModel(type: $0)
+                })
+            ))
     )
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Settings"
+        
+        addSwiftUIController()
 
+    }
+    
+    private func addSwiftUIController() {
+        addChild(settingsSwiftUIController)
+        settingsSwiftUIController.didMove(toParent: self)
+        
+        view.addSubview(settingsSwiftUIController.view)
+        settingsSwiftUIController.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            settingsSwiftUIController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            settingsSwiftUIController.view.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            settingsSwiftUIController.view.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            settingsSwiftUIController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+        ])
     }
 }
 
@@ -73,8 +94,52 @@ We want to compactMap .allCases, which means that we are going to loop over all 
 
 This is done by passing in $0 as the argument of type.
 
+The next section plugs the viewModel we've created in this step into its UIHostingController() initializer.
+This is the viewModel that we created in this step :
+
+    private let viewModel = RMSettingsViewViewModel(
+        cellViewModels: RMSettingsOption.allCases.compactMap({
+            return RMSettingsCellViewModel(type: $0)
+        })
+    )
+
+
+
 Head over to RMSettingsOption.
 
+
+
+*/
+
+
+/*
+
+
+-> SwiftUI Settings View Section
+
+
+settingsSwiftUIController ) Coming from RMSettingsView, in order to interchangeably use UIKit and SwiftUI, we need to implement a Hosting View a.k.a Hosting View Controller.
+
+UIHostingController() can be created with a rootView which in this case will be RMSettingsView.
+Note that we are granted access to the rootView option when we import SwiftUI at the top of the file.
+
+RMSettingsView needs a ViewModel in order to be initialized.
+We are going to take the viewModel that we created in the previous section and we are going to plug it into UIHostingController's RMSettingsView instance.
+
+
+
+addSwiftUIController ) Once we've created our UIHostingController() and stored it in settingsSwiftUIController, the next step is to integrate it into our UIKit based ViewController.
+
+To do that, we are going to create a Function called addSwiftUIController() and call it inside of viewDidLoad().
+We then invoke addChild() and pass in our UIHostingController instance.
+
+We also notify RMSettingsViewController that our UIHostingController() instance is under its hierarchy, which means that the settingsSwiftUIController is a child of the RMSettingsViewController (the parent).
+
+After we add the UIHostingController() to our ViewController's hierarchy, we are going to add our settingsSwiftUIController's View to the parent View.
+
+We also need to set settingsSwiftUIController's View's .translatesAutoresizingMaskIntoConstraints to false and set our constraints.
+
+Head over to RMSettingsView to debug.
 
 
 */
