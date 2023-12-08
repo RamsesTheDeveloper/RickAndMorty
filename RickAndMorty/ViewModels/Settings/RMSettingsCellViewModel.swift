@@ -67,6 +67,8 @@ We will also make our Struct Hashable which works alongside it being Identifiabl
 
 The purpose of having our Struct adopt Identifiable is so that when SwiftUI loops over them, it will be able to disambiguate between unique ViewModels.
 
+Head over to RMSettingsView.
+
 
 
 */
