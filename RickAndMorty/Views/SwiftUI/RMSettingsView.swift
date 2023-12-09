@@ -33,15 +33,21 @@ struct RMSettingsView: View {
                 
                 Text(viewModel.title)
                     .padding(.leading, 10)
+                
+                Spacer()
             }
             .padding(.bottom, 3)
+            .onTapGesture {
+                viewModel.onTapHandler(viewModel.type)
+            }
         }
     }
 }
 
 #Preview {
     RMSettingsView(viewModel: .init(cellViewModels: RMSettingsOption.allCases.compactMap({
-        return RMSettingsCellViewModel(type: $0)
+        return RMSettingsCellViewModel(type: $0) { option in
+        }
     })))
 }
 
@@ -87,5 +93,34 @@ Debug ) Coming from RMSettingsViewController, we are going to delete our ScrollV
 HStack ) For context, we are using .template because we want to modify our RMSettingsOption's image whereas .original would not allow us to modify the image.
 
 
+
+*/
+
+
+/*
+
+
+-> Tap Setting Options Section
+
+
+onTapHandler ) In this section we are going to implement tap functionality into our List and handling user interaction.
+Traditionally, we would use a NavigationLink or a Binding/State object to figure out which object is being selected.
+
+However, we are using UIKit for the RMSettingsViewController, so our goal is to facilitate the interaction, take the cell selected from RMSettingsView's HStack, and pass it over to UIKit.
+
+Head over to RMSettingsViewController.
+
+Coming from RMSettingsViewController, we are going to implement an .onTapHandler() which will call our viewModel's .onTapHandler() Function.
+The .onTapHandler() Function does not exist as of now.
+
+The thinking here is that we would pass in the cell that was selected into our viewModel's .onTapHandler() Function.
+However, each of our cellViewModels are specific to a given case in our RMSettingsOption Enum.
+
+Head over to RMSettingsCellViewModel.
+
+Coming from RMSettingsViewController, we are going to call our .onTapHandler Closure within .onTapGesture.
+In order for that code to work we needed to make RMSettingsCellViewModel's type Constant, public.
+
+Head over to RMSettingsViewController.
 
 */

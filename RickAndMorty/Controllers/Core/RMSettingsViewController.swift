@@ -11,14 +11,7 @@ import UIKit
 /// Controller to show various app options and settings
 final class RMSettingsViewController: UIViewController {
     
-    private let settingsSwiftUIController = UIHostingController(
-        rootView: RMSettingsView(
-            viewModel: RMSettingsViewViewModel(
-                cellViewModels: RMSettingsOption.allCases.compactMap({
-                    return RMSettingsCellViewModel(type: $0)
-                })
-            ))
-    )
+    private var settingsSwiftUIController: UIHostingController<RMSettingsView>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +23,18 @@ final class RMSettingsViewController: UIViewController {
     }
     
     private func addSwiftUIController() {
+        
+        let settingsSwiftUIController = UIHostingController(
+            rootView: RMSettingsView(
+                viewModel: RMSettingsViewViewModel(
+                    cellViewModels: RMSettingsOption.allCases.compactMap({
+                        return RMSettingsCellViewModel(type: $0) { option in
+                            print(option.displayTitle)
+                        }
+                    })
+                ))
+        )
+        
         addChild(settingsSwiftUIController)
         settingsSwiftUIController.didMove(toParent: self)
         
@@ -42,6 +47,8 @@ final class RMSettingsViewController: UIViewController {
             settingsSwiftUIController.view.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
             settingsSwiftUIController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
+        
+        self.settingsSwiftUIController = settingsSwiftUIController
     }
 }
 
@@ -140,6 +147,52 @@ After we add the UIHostingController() to our ViewController's hierarchy, we are
 We also need to set settingsSwiftUIController's View's .translatesAutoresizingMaskIntoConstraints to false and set our constraints.
 
 Head over to RMSettingsView to debug.
+
+
+*/
+
+
+/*
+
+
+-> Tap Setting Options Section
+
+
+onTapHandler ) Coming from RMSettingsView, we are going to make our UIHostingController Optional and mutable by making Variable.
+Then, we are going to take the code that we assigned to settingsSwiftUIController in the previous step and assign it to settingsSwiftUIController within the addSwiftUIController() Function with the small difference that it will be a Constant.
+
+UIHostingController takes a Generic, <Content: View>, so we are going to specify that the UIHostingController that will be created in the future will be a HostingController for the RMSettingsView.
+
+Meaning that we are making RMSettingsViewController's UIHostingController Optional and giving it a Type because UIHostingController requires us to do so, later on that UIHostingController is instantiated in our addSwiftUIController() Function.
+
+We are refactoring our code because our goal is to introduce an additional parameter into our RMSettingsView.
+That parameter will be used to notify our RMSettingsViewController that a cell in the List has been tapped.
+We want that parameter to be a Closure that takes in the selected cell as an argument.
+
+This is the code from the previous section :
+
+    private let settingsSwiftUIController = UIHostingController(
+        rootView: RMSettingsView(
+            viewModel: RMSettingsViewViewModel(
+                cellViewModels: RMSettingsOption.allCases.compactMap({
+                return RMSettingsCellViewModel(type: $0)
+            })
+        ))
+    )
+
+Once it is added to the screen, we are going to retain the UIHostingController instance in the global scope.
+We retain it by setting our settingsSwiftUIController Variable equal to our settingsSwiftUIController Constant within the addSwiftUIController() Function.
+
+Head over to RMSettingsView.
+
+Coming from RMSettingsCellViewModel, we are going to implement our onTapHandler in the form of a Closure within the addSwiftUIController() Function and we will print out the cell's displayTitle for now.
+
+Head over to RMSettingsView.
+
+
+
+Coming from RMSettingsView, 
+
 
 
 */

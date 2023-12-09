@@ -7,16 +7,18 @@
 
 import UIKit
 
-struct RMSettingsCellViewModel: Identifiable, Hashable {
+struct RMSettingsCellViewModel: Identifiable {
     
     let id = UUID()
     
-    private let type: RMSettingsOption
+    public let type: RMSettingsOption
+    public let onTapHandler: (RMSettingsOption) -> Void
     
     // MARK: - Initializer
     
-    init(type: RMSettingsOption) {
+    init(type: RMSettingsOption, onTapHandler: @escaping (RMSettingsOption) -> Void) {
         self.type = type
+        self.onTapHandler = onTapHandler
     }
     
     // MARK: - Public
@@ -70,5 +72,21 @@ The purpose of having our Struct adopt Identifiable is so that when SwiftUI loop
 Head over to RMSettingsView.
 
 
+
+*/
+
+
+/*
+
+
+-> Tap Setting Options Section
+
+
+onTapHandler ) Coming from RMSettingsView, we are going to add another parameter to our RMSettingsCellViewModel's initializer.
+Our onTapHandler will be an escaping Closure that receives an argument of Type RMSettingsOption, our Enum.
+
+At the top of our Class we are declaring an onTapHandler Constant and that onTapHandler Constant receives a value when our caller passes it in, once that value is received, it is assigned iniside of our initializer.
+
+Head over to RMSettingsViewController.
 
 */
